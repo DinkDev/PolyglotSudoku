@@ -1,15 +1,16 @@
 import * as Collections from 'typescript-collections';
 import { Cell } from './Cell';
 
-class Board {
+export class Board {
     public validOrders: Collections.Set<number> = new Collections.Set<number>();
-    public boardOrder: number;
-    public cells: Cell[][];
+    public boardOrder: number = -1;
+    public cells: Cell[][] = [];
 
     /**
      * Ctor for a Sudoku Board using a string of values (0-9 or <space>,1-9).
      *
      * @param definition The string to parse the sudoku board from,
+     *  or a string[] representing the rows to parse the sudoku board from,
      *  or a number[][] representing the sudoku board,
      *  or a number representing the order of the sudoku board.
      *
@@ -22,7 +23,7 @@ class Board {
 
         if (typeof definition === 'string') {
             // assume it's a compact string of numeric values
-            // todo: may want to support hex for order of 16!
+            // todo: may want to support hex+'g' for order of 16!
             const cellCount: number = definition.length;
             if (!this.isValidCellCount(cellCount)) {
                 throw new Error(`${cellCount} is an invalid cell count.`);
@@ -35,15 +36,25 @@ class Board {
                 for (let c = 0; c < this.boardOrder; c++) {
                     const cellString: string = rowString.slice(0, this.boardOrder);
                     const cellNumber: number = Number(cellString);
-                    if (Number.isNaN(cellNumber)) {
+                    if (isNaN(cellNumber)) {
                         this.cells[r][c] = new Cell();
                     } else {
                         this.cells[r][c] = new Cell(cellNumber);
                     }
                 }
             }
-        } else if (Array.isArray(definition) && Array.isArray(definition[0] && typeof definition[0][0] === 'number')) {
-            // it's an array of rows or arrays columns of number
+        } else if (Array.isArray(definition) && typeof definition[0] === 'string') {
+            // assume it's a compact string of numeric values
+            // todo: may want to support hex+'g' for order of 16!
+
+            // it's an array of rows of strings
+            const definitionArray: string[] = definition as string[];
+
+            if (!this.validOrders.contains(definitionArray.length)) {
+                throw new Error(`${definitionArray.length} is an invalid board order.`);
+            }
+        } else if (Array.isArray(definition) && Array.isArray(definition[0]) && typeof definition[0][0] === 'number') {
+            // it's an array of rows of arrays columns of number
             const definitionArray: number[][] = definition as number[][];
 
             if (!this.validOrders.contains(definitionArray.length)) {
