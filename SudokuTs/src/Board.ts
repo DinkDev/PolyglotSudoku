@@ -4,7 +4,7 @@ import { Cell } from './Cell';
 export class Board {
     public validOrders: Collections.Set<number> = new Collections.Set<number>();
     public boardOrder: number = -1;
-    public cells: Cell[][] = [];
+    public cells: Cell[][] = new Array<Cell[]>();
 
     /**
      * Ctor for a Sudoku Board using a string of values (0-9 or <space>,1-9).
@@ -31,17 +31,10 @@ export class Board {
 
             this.boardOrder = Math.sqrt(cellCount);
 
-            for (let r = 0; r < this.boardOrder; r++) {
-                const rowString: string = definition.slice(r * this.boardOrder, (r + 1) * this.boardOrder);
-                for (let c = 0; c < this.boardOrder; c++) {
-                    const cellString: string = rowString.slice(0, this.boardOrder);
-                    const cellNumber: number = Number(cellString);
-                    if (isNaN(cellNumber)) {
-                        this.cells[r][c] = new Cell();
-                    } else {
-                        this.cells[r][c] = new Cell(cellNumber);
-                    }
-                }
+            for (let rIndex = 0; rIndex < this.boardOrder; rIndex++) {
+                this.cells[rIndex] = new Array<Cell>();
+                const rowString: string = definition.slice(rIndex * this.boardOrder, (rIndex + 1) * this.boardOrder);
+                this.parseRow(rowString, rIndex);
             }
         } else if (Array.isArray(definition) && typeof definition[0] === 'string') {
             // assume it's a compact string of numeric values
@@ -49,9 +42,18 @@ export class Board {
 
             // it's an array of rows of strings
             const definitionArray: string[] = definition as string[];
+            const cellCount = definitionArray.length;
 
-            if (!this.validOrders.contains(definitionArray.length)) {
+            if (!this.validOrders.contains(cellCount)) {
                 throw new Error(`${definitionArray.length} is an invalid board order.`);
+            }
+
+            this.boardOrder = cellCount;
+
+            for (let rIndex = 0; rIndex < this.boardOrder; rIndex++) {
+                this.cells[rIndex] = new Array<Cell>();
+                const rowString: string = definitionArray[rIndex];
+                this.parseRow(rowString, rIndex);
             }
         } else if (Array.isArray(definition) && Array.isArray(definition[0]) && typeof definition[0][0] === 'number') {
             // it's an array of rows of arrays columns of number
@@ -66,6 +68,7 @@ export class Board {
                 if (!this.validOrders.contains(rValue.length)) {
                     throw new Error(`Row ${rIndex} has a length of ${rValue.length} that is an invalid board order.`);
                 }
+                this.cells[rIndex] = new Array<Cell>();
 
                 rValue.forEach((cValue, cIndex) => {
                     this.cells[rIndex][cIndex] = new Cell(cValue);
@@ -78,12 +81,26 @@ export class Board {
             }
 
             for (let rIndex: number = 0; rIndex < definition; rIndex++) {
+                this.cells[rIndex] = new Array<Cell>();
+
                 for (let cIndex: number = 0; cIndex < definition; cIndex++) {
                     this.cells[rIndex][cIndex] = new Cell();
                 }
             }
         } else {
             throw new Error(`${typeof definition} is not supported.`);
+        }
+    }
+
+    public parseRow(rowString: string, r: number) {
+        for (let c = 0; c < this.boardOrder; c++) {
+            const cellString: string = rowString.slice(c, c + 1);
+            const cellNumber: number = Number(cellString);
+            if (isNaN(cellNumber)) {
+                this.cells[r][c] = new Cell();
+            } else {
+                this.cells[r][c] = new Cell(cellNumber);
+            }
         }
     }
 
