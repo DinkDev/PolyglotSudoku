@@ -1,7 +1,7 @@
 export class Cell {
+    public static noCellValue: number = 0; /** normalize values for cell with no value assigned yet */
     public isGiven: boolean;
     public cellValue: number;
-    public noCellValue: number = 0; /** normalize values for cell with no value assigned yet */
 
     /**
      * Overloaded initialization for Cell with a given value.
@@ -14,7 +14,7 @@ export class Cell {
             this.cellValue = givenValue;
         } else {
             this.isGiven = false;
-            this.cellValue = this.noCellValue;
+            this.cellValue = Cell.noCellValue;
         }
     }
 }

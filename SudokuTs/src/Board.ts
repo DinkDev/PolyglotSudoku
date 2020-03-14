@@ -9,7 +9,8 @@ export class Board {
     /**
      * Ctor for a Sudoku Board using a string of values (0-9 or <space>,1-9).
      *
-     * @param definition The string to parse the sudoku board from,
+     * @param definition
+     *  The string to parse the sudoku board from,
      *  or a string[] representing the rows to parse the sudoku board from,
      *  or a number[][] representing the sudoku board,
      *  or a number representing the order of the sudoku board.
@@ -23,8 +24,8 @@ export class Board {
 
         if (typeof definition === 'string') {
             // assume it's a compact string of numeric values
-            // todo: may want to support hex+'g' for order of 16!
             const cellCount: number = definition.length;
+
             if (!this.isValidCellCount(cellCount)) {
                 throw new Error(`${cellCount} is an invalid cell count.`);
             }
@@ -37,18 +38,14 @@ export class Board {
                 this.parseRow(rowString, rIndex);
             }
         } else if (Array.isArray(definition) && typeof definition[0] === 'string') {
-            // assume it's a compact string of numeric values
-            // todo: may want to support hex+'g' for order of 16!
-
-            // it's an array of rows of strings
+            // assume it's an array of rows of strings
             const definitionArray: string[] = definition as string[];
-            const cellCount = definitionArray.length;
 
-            if (!this.validOrders.contains(cellCount)) {
+            if (!this.validOrders.contains(definitionArray.length)) {
                 throw new Error(`${definitionArray.length} is an invalid board order.`);
             }
 
-            this.boardOrder = cellCount;
+            this.boardOrder = definitionArray.length;
 
             for (let rIndex = 0; rIndex < this.boardOrder; rIndex++) {
                 this.cells[rIndex] = new Array<Cell>();
@@ -62,6 +59,7 @@ export class Board {
             if (!this.validOrders.contains(definitionArray.length)) {
                 throw new Error(`${definitionArray.length} is an invalid board order.`);
             }
+
             this.boardOrder = definitionArray.length;
 
             definitionArray.forEach((rValue, rIndex) => {
@@ -80,10 +78,12 @@ export class Board {
                 throw new Error(`${definition} is an invalid board order.`);
             }
 
-            for (let rIndex: number = 0; rIndex < definition; rIndex++) {
+            this.boardOrder = definition as number;
+
+            for (let rIndex: number = 0; rIndex < this.boardOrder; rIndex++) {
                 this.cells[rIndex] = new Array<Cell>();
 
-                for (let cIndex: number = 0; cIndex < definition; cIndex++) {
+                for (let cIndex: number = 0; cIndex < this.boardOrder; cIndex++) {
                     this.cells[rIndex][cIndex] = new Cell();
                 }
             }
@@ -93,6 +93,8 @@ export class Board {
     }
 
     public parseRow(rowString: string, r: number) {
+        // todo: may want to support hex+'g' for order of 16!
+
         for (let c = 0; c < this.boardOrder; c++) {
             const cellString: string = rowString.slice(c, c + 1);
             const cellNumber: number = Number(cellString);
