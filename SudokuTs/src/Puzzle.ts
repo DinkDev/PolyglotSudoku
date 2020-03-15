@@ -1,10 +1,10 @@
 import * as Collections from 'typescript-collections';
-import { Cell } from './Cell';
+import { cell } from './cell';
 
-export class Board {
+export class Puzzle {
     public validOrders: Collections.Set<number> = new Collections.Set<number>();
     public boardOrder: number = -1;
-    public cells: Cell[][] = new Array<Cell[]>();
+    public grid: cell[][] = new Array<cell[]>();
 
     /**
      * Ctor for a Sudoku Board using a string of values (0-9 or <space>,1-9).
@@ -33,7 +33,7 @@ export class Board {
             this.boardOrder = Math.sqrt(cellCount);
 
             for (let rIndex = 0; rIndex < this.boardOrder; rIndex++) {
-                this.cells[rIndex] = new Array<Cell>();
+                this.grid[rIndex] = new Array<cell>();
                 const rowString: string = definition.slice(rIndex * this.boardOrder, (rIndex + 1) * this.boardOrder);
                 this.parseRow(rowString, rIndex);
             }
@@ -48,7 +48,7 @@ export class Board {
             this.boardOrder = definitionArray.length;
 
             for (let rIndex = 0; rIndex < this.boardOrder; rIndex++) {
-                this.cells[rIndex] = new Array<Cell>();
+                this.grid[rIndex] = new Array<(number|null)>();
                 const rowString: string = definitionArray[rIndex];
                 this.parseRow(rowString, rIndex);
             }
@@ -66,10 +66,10 @@ export class Board {
                 if (!this.validOrders.contains(rValue.length)) {
                     throw new Error(`Row ${rIndex} has a length of ${rValue.length} that is an invalid board order.`);
                 }
-                this.cells[rIndex] = new Array<Cell>();
+                this.grid[rIndex] = new Array<(number|null)>();
 
                 rValue.forEach((cValue, cIndex) => {
-                    this.cells[rIndex][cIndex] = new Cell(cValue);
+                    this.grid[rIndex][cIndex] = this.GetCellValue(cValue);
                 });
             });
         } else if (typeof definition === 'number') {
@@ -81,10 +81,10 @@ export class Board {
             this.boardOrder = definition as number;
 
             for (let rIndex: number = 0; rIndex < this.boardOrder; rIndex++) {
-                this.cells[rIndex] = new Array<Cell>();
+                this.grid[rIndex] = new Array<cell>();
 
                 for (let cIndex: number = 0; cIndex < this.boardOrder; cIndex++) {
-                    this.cells[rIndex][cIndex] = new Cell();
+                    this.grid[rIndex][cIndex] = null;
                 }
             }
         } else {
@@ -99,11 +99,19 @@ export class Board {
             const cellString: string = rowString.slice(c, c + 1);
             const cellNumber: number = Number(cellString);
             if (isNaN(cellNumber)) {
-                this.cells[r][c] = new Cell();
+                this.grid[r][c] = null;
             } else {
-                this.cells[r][c] = new Cell(cellNumber);
+                this.grid[r][c] = cellNumber;
             }
         }
+    }
+
+    private GetCellValue(cValue: number) {
+        let cellValue = null;
+        if (typeof (cValue) === 'number' && cValue > 0) {
+            cellValue = cValue;
+        }
+        return cellValue;
     }
 
     /**
