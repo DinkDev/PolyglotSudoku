@@ -8,29 +8,65 @@ export class Puzzle {
     public grid: cellType[][] = new Array<cellType[]>();
 
     /**
-     * Ctor for a Sudoku Board using a string of values (0-9 or <space>,1-9).
+     * Ctor for a sudoku Puzzle.
+     *
+     * @param definition
+     * null, which just initializes an empty Puzzle,
+     * or a number representing the size of the sudoku Puzzle,
+     * or another Puzzle to copy
+     */
+    constructor(definition: any = null) {
+
+        // is it anything
+        if (definition !== null) {
+            // is it the size
+            if (typeof definition === 'number') {
+                            // it's the order of the sudoku board
+                if (!PuzzleSizeUtil.isValid(definition)) {
+                    throw new Error(`${definition} is an invalid board order.`);
+                }
+
+                this.puzzleSize = PuzzleSizeUtil.toPuzzleSize(definition as number);
+                this.createGrid();
+
+            } else if (definition instanceof Puzzle) {
+                this.puzzleSize = definition.puzzleSize;
+                this.createGrid();
+                this.parse(definition.toString());
+            }
+        }
+    }
+
+    public createGrid() {
+        for (let rIndex: number = 0; rIndex < this.puzzleSize; rIndex++) {
+            this.grid[rIndex] = new Array<cellType>();
+            for (let cIndex: number = 0; cIndex < this.puzzleSize; cIndex++) {
+                this.grid[rIndex][cIndex] = null;
+            }
+        }
+    }
+
+    /**
+     * Takes a string or array of strings representation of a puzzle and loads it into a puzzle dictionary.
      *
      * @param definition
      *  The string to parse the sudoku board from,
      *  or a string[] representing the rows to parse the sudoku board from,
-     *  or a number[][] representing the sudoku board,
-     *  or a number representing the order of the sudoku board.
      *
      * @error If the length of definition isn't valid.
      */
-    constructor(definition: any) {
+    public parse(definition: any) {
 
         if (typeof definition === 'string') {
             // assume it's a compact string of numeric values
             const cellCount: number = definition.length;
 
-            const size = Math.sqrt(cellCount);
+            const size = this.inferPuzzleSizeByCellCount(cellCount);
 
-            if (!PuzzleSizeUtil.isValid(size)) {
-                throw new Error(`${cellCount} is an invalid cell count.`);
+            if (size !== this.puzzleSize) {
+                this.puzzleSize = size;
+                this.createGrid();
             }
-
-            this.puzzleSize = PuzzleSizeUtil.toPuzzleSize(size);
 
             for (let rIndex = 0; rIndex < this.puzzleSize; rIndex++) {
                 this.grid[rIndex] = new Array<cellType>();
@@ -41,51 +77,17 @@ export class Puzzle {
             // assume it's an array of rows of strings
             const definitionArray: string[] = definition as string[];
 
-            if (!PuzzleSizeUtil.isValid(definitionArray.length)) {
-                throw new Error(`${definitionArray.length} is an invalid board order.`);
-            }
+            const size = this.inferPuzzleSizeByRowLength(definitionArray.length);
 
-            this.puzzleSize = definitionArray.length;
+            if (size !== this.puzzleSize) {
+                this.puzzleSize = size;
+                this.createGrid();
+            }
 
             for (let rIndex = 0; rIndex < this.puzzleSize; rIndex++) {
                 this.grid[rIndex] = new Array<(number|null)>();
                 const rowString: string = definitionArray[rIndex];
                 this.parseRow(rowString, rIndex);
-            }
-        } else if (Array.isArray(definition) && Array.isArray(definition[0]) && typeof definition[0][0] === 'number') {
-            // it's an array of rows of arrays columns of number
-            const definitionArray: number[][] = definition as number[][];
-
-            if (!PuzzleSizeUtil.isValid(definitionArray.length)) {
-                throw new Error(`${definitionArray.length} is an invalid board order.`);
-            }
-
-            this.puzzleSize = definitionArray.length;
-
-            definitionArray.forEach((rValue, rIndex) => {
-                if (!PuzzleSizeUtil.isValid(rValue.length)) {
-                    throw new Error(`Row ${rIndex} has a length of ${rValue.length} that is an invalid board order.`);
-                }
-                this.grid[rIndex] = new Array<(number|null)>();
-
-                rValue.forEach((cValue, cIndex) => {
-                    this.grid[rIndex][cIndex] = this.getCellValue(cValue);
-                });
-            });
-        } else if (typeof definition === 'number') {
-            // it's the order of the sudoku board
-            if (!PuzzleSizeUtil.isValid(definition)) {
-                throw new Error(`${definition} is an invalid board order.`);
-            }
-
-            this.puzzleSize = definition as number;
-
-            for (let rIndex: number = 0; rIndex < this.puzzleSize; rIndex++) {
-                this.grid[rIndex] = new Array<cellType>();
-
-                for (let cIndex: number = 0; cIndex < this.puzzleSize; cIndex++) {
-                    this.grid[rIndex][cIndex] = null;
-                }
             }
         } else {
             throw new Error(`${typeof definition} is not supported.`);
@@ -111,6 +113,66 @@ export class Puzzle {
                 this.grid[r][c] = cellNumber;
             }
         }
+    }
+
+    /**
+     * Converts a puzzle to a string representation.
+     */
+    public toString(): string {
+        let rv: string = '';
+
+        for (let rIndex: number = 0; rIndex < this.puzzleSize; rIndex++) {
+            for (let cIndex: number = 0; cIndex < this.puzzleSize; cIndex++) {
+                rv += this.convertToChar(this.grid[rIndex][cIndex]);
+            }
+        }
+
+        return rv;
+    }
+
+    /**
+     * Converts a Puzzle cell's value to a character.
+     *
+     * @param cellValue the value of a Puzzle cell
+     */
+    public convertToChar(cellValue: cellType): string {
+        if (cellValue !== null) {
+            if (cellValue > 0 && cellValue < 16) {
+                return cellValue.toString(16);
+            } else if (cellValue === 16) {
+                return 'g';
+            }
+        }
+        return '.';
+    }
+
+    /**
+     * Gets the PuzzleSize for total cell count in a puzzle grid.
+     *
+     * @param cellCount: The total cell count in a puzzle grid.
+     */
+    public inferPuzzleSizeByCellCount(cellCount: number, throwIfUndefined: boolean = true): PuzzleSize {
+        const size = Math.sqrt(cellCount);
+
+        if (!PuzzleSizeUtil.isValid(size) && throwIfUndefined) {
+            throw new Error(`${cellCount} is an invalid cell count.`);
+        }
+
+        return PuzzleSizeUtil.toPuzzleSize(size);
+    }
+
+    /**
+     * Gets the PuzzleSize from the length of a row in a puzzle grid.
+     *
+     * @param size: The length of a row in a puzzle grid.
+     */
+    public inferPuzzleSizeByRowLength(size: number, throwIfUndefined: boolean = true): PuzzleSize {
+
+        if (!PuzzleSizeUtil.isValid(size) && throwIfUndefined) {
+            throw new Error(`${size} is an invalid cell count.`);
+        }
+
+        return PuzzleSizeUtil.toPuzzleSize(size);
     }
 
     /**
