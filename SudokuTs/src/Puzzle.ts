@@ -104,6 +104,7 @@ export class Puzzle {
      * @returns true is valid, false otherwise.
      */
     public parseRow(rowString: string, r: number) {
+
         // todo: may want to support hex+'g' for order of 16!
 
         for (let c = 0; c < this.puzzleSize; c++) {
