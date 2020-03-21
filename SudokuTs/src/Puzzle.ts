@@ -7,6 +7,8 @@ export class Puzzle {
     public puzzleSize: PuzzleSize = PuzzleSize.Undefined;
     public grid: cellType[][] = new Array<cellType[]>();
 
+    public readonly NullChar = '.';
+
     /**
      * Ctor for a sudoku Puzzle.
      *
@@ -143,7 +145,7 @@ export class Puzzle {
                 return 'g';
             }
         }
-        return '.';
+        return this.NullChar;
     }
 
     /**
