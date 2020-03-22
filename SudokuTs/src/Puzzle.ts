@@ -34,7 +34,7 @@ export class Puzzle {
             } else if (definition instanceof Puzzle) {
                 this.puzzleSize = definition.puzzleSize;
                 this.createGrid();
-                this.parse(definition.toString());
+                this.loadPuzzle(definition.toString());
             }
         }
     }
@@ -52,12 +52,12 @@ export class Puzzle {
      * Takes a string or array of strings representation of a puzzle and loads it into a puzzle dictionary.
      *
      * @param definition
-     *  The string to parse the sudoku board from,
+     *  The string to load the sudoku board from,
      *  or a string[] representing the rows to parse the sudoku board from,
      *
      * @error If the length of definition isn't valid.
      */
-    public parse(definition: any) {
+    public loadPuzzle(definition: any) {
 
         if (typeof definition === 'string') {
             // assume it's a compact string of numeric values

@@ -29,7 +29,7 @@ describe('Puzzle constructor', () => {
             '..4.87..2',
         ];
         const other = new Puzzle(9);
-        other.parse(boardDef);
+        other.loadPuzzle(boardDef);
 
         const sut = new Puzzle(other);
         expect(sut.puzzleSize).to.equal(PuzzleSize.NineByNine);
@@ -47,7 +47,7 @@ describe('Puzzle.parse', () => {
         const boardDef = '4..27.6..798156234.2.84...7237468951849531726561792843.82.15479.7..243....4.87..2';
 
         const sut = new Puzzle(9);
-        sut.parse(boardDef);
+        sut.loadPuzzle(boardDef);
 
         expect(sut.puzzleSize).to.equal(9);
         expect(sut.grid[0][0]).to.equal(4);
@@ -70,7 +70,7 @@ describe('Puzzle.parse', () => {
         ];
 
         const sut = new Puzzle(9);
-        sut.parse(boardDef);
+        sut.loadPuzzle(boardDef);
 
         expect(sut.puzzleSize).to.equal(PuzzleSize.NineByNine);
         expect(sut.grid[0][0]).to.equal(4);
