@@ -5,7 +5,8 @@ export type cellType = number | null;
 
 export class Puzzle {
     public puzzleSize: PuzzleSize = PuzzleSize.Undefined;
-    public grid: cellType[][] = new Array<cellType[]>();
+    public grid: Collections.Dictionary<string, cellType>
+        = new Collections.Dictionary<string, cellType>();
 
     public readonly NullChar = '.';
 
@@ -23,7 +24,7 @@ export class Puzzle {
         if (definition !== null) {
             // is it the size
             if (typeof definition === 'number') {
-                            // it's the order of the sudoku board
+                // it's the order of the sudoku board
                 if (!PuzzleSizeUtil.isValid(definition)) {
                     throw new Error(`${definition} is an invalid board order.`);
                 }
@@ -41,9 +42,8 @@ export class Puzzle {
 
     public createGrid() {
         for (let rIndex: number = 0; rIndex < this.puzzleSize; rIndex++) {
-            this.grid[rIndex] = new Array<cellType>();
             for (let cIndex: number = 0; cIndex < this.puzzleSize; cIndex++) {
-                this.grid[rIndex][cIndex] = null;
+                this.grid.setValue(`r${rIndex}c${cIndex}`, null);
             }
         }
     }
@@ -71,7 +71,6 @@ export class Puzzle {
             }
 
             for (let rIndex = 0; rIndex < this.puzzleSize; rIndex++) {
-                this.grid[rIndex] = new Array<cellType>();
                 const rowString: string = definition.slice(rIndex * this.puzzleSize, (rIndex + 1) * this.puzzleSize);
                 this.parseRow(rowString, rIndex);
             }
@@ -87,7 +86,6 @@ export class Puzzle {
             }
 
             for (let rIndex = 0; rIndex < this.puzzleSize; rIndex++) {
-                this.grid[rIndex] = new Array<(number|null)>();
                 const rowString: string = definitionArray[rIndex];
                 this.parseRow(rowString, rIndex);
             }
@@ -111,9 +109,9 @@ export class Puzzle {
             const cellString: string = rowString.slice(c, c + 1);
             const cellNumber: number = Number(cellString);
             if (isNaN(cellNumber)) {
-                this.grid[r][c] = null;
+                this.grid.setValue(`r${r}c${c}`, null);
             } else {
-                this.grid[r][c] = cellNumber;
+                this.grid.setValue(`r${r}c${c}`, cellNumber);
             }
         }
     }
@@ -126,7 +124,9 @@ export class Puzzle {
 
         for (let rIndex: number = 0; rIndex < this.puzzleSize; rIndex++) {
             for (let cIndex: number = 0; cIndex < this.puzzleSize; cIndex++) {
-                rv += this.convertToChar(this.grid[rIndex][cIndex]);
+                // rv += this.convertToChar(this.grid[rIndex][cIndex]);
+                rv += this.convertToChar(this.grid.getValue(`r${rIndex}c${cIndex}`));
+
             }
         }
 
@@ -138,8 +138,8 @@ export class Puzzle {
      *
      * @param cellValue the value of a Puzzle cell
      */
-    public convertToChar(cellValue: cellType): string {
-        if (cellValue !== null) {
+    public convertToChar(cellValue: cellType | undefined): string {
+        if (cellValue) {
             if (cellValue > 0 && cellValue < 16) {
                 return cellValue.toString(16);
             } else if (cellValue === 16) {
