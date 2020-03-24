@@ -5,21 +5,24 @@ class Puzzle:
     ## See http://norvig.com/sudoku.html
 
     ## Throughout this program we have:
-    ##   r is a row,    e.g. 'A'
-    ##   c is a column, e.g. '3'
-    ##   s is a square, e.g. 'A3'
+    ##   r is a row,    e.g. 'r1'
+    ##   c is a column, e.g. 'c3'
+    ##   s is a square, e.g. 'r1c3'
     ##   d is a digit,  e.g. '9'
-    ##   u is a unit,   e.g. ['A1','B1','C1','D1','E1','F1','G1','H1','I1']
+    ##   u is a unit,   e.g. ['r1c1','r2c1','r3c1','r4c1','r5c1','r6c1','r7c1','r8c1','r9c1']
     ##   grid is a grid,e.g. 81 non-blank chars, e.g. starting with '.18...7...
-    ##   values is a dict of possible values, e.g. {'A1':'12349', 'A2':'8', ...}
+    ##   values is a dict of possible values, e.g. {'r1c1':'12349', 'r1c2':'8', ...}
 
     def __init__(self):
         super().__init__()
         self.digits = '123456789'
-        self.rows = 'ABCDEFGHI'
-        self.cols = self.digits
+        self.rows = ['r' + d for d in self.digits]
+        self.cols = ['c' + d for d in self.digits]
         self.squares  = self.cross(self.rows, self.cols)
-        self.unitlist = ([self.cross(self.rows, c) for c in self.cols] + [self.cross(r, self.cols) for r in self.rows] + [self.cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')])
+        self.unitlist = ([self.cross(self.rows, [c]) for c in self.cols] 
+        + [self.cross([r], self.cols) for r in self.rows] 
+            + [self.cross(rs, cs) for rs in (['r1', 'r2', 'r3'], ['r4', 'r5', 'r6'], ['r7', 'r8', 'r9'])
+            for cs in (['c1', 'c2', 'c3'], ['c4', 'c5', 'c6'], ['c7', 'c8', 'c9'])])
         self.units = dict((s, [u for u in self.unitlist if s in u]) for s in self.squares)
         self.peers = dict((s, set(sum(self.units[s],[]))-set([s])) for s in self.squares)
 

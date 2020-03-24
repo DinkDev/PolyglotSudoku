@@ -9,12 +9,15 @@ def test_init():
     assert len(p.unitlist) == 27
     assert all(len(p.units[s]) == 3 for s in p.squares)
     assert all(len(p.peers[s]) == 20 for s in p.squares)
-    assert p.units['C2'] == [['A2', 'B2', 'C2', 'D2', 'E2', 'F2', 'G2', 'H2', 'I2'],
-                             ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9'],
-                             ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3']]
-    assert p.peers['C2'] == set(['A2', 'B2', 'D2', 'E2', 'F2', 'G2', 'H2', 'I2',
-                               'C1', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9',
-                               'A1', 'A3', 'B1', 'B3'])
+
+    assert p.units['r3c2'] == [['r1c2', 'r2c2', 'r3c2', 'r4c2', 'r5c2', 'r6c2', 'r7c2', 'r8c2', 'r9c2'],
+                             ['r3c1', 'r3c2', 'r3c3', 'r3c4', 'r3c5', 'r3c6', 'r3c7', 'r3c8', 'r3c9'],
+                             ['r1c1', 'r1c2', 'r1c3', 'r2c1', 'r2c2', 'r2c3', 'r3c1', 'r3c2', 'r3c3']]    
+
+    assert p.peers['r3c2'] == set(['r1c2', 'r2c2', 'r4c2', 'r5c2', 'r6c2', 'r7c2', 'r8c2', 'r9c2',
+                               'r3c1', 'r3c3', 'r3c4', 'r3c5', 'r3c6', 'r3c7', 'r3c8', 'r3c9',
+                               'r1c1', 'r1c3', 'r2c1', 'r2c3'])
+    
     print('All tests pass.')
 
 import time
