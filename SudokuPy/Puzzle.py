@@ -31,18 +31,27 @@ class Puzzle:
         self.units = dict((s, [u for u in self.unit_list if s in u]) for s in self.squares)
         self.peers = dict((s, set(sum(self.units[s], [])) - {s}) for s in self.squares)
 
-    def parse_grid(self, grid):
+    def load_puzzle(self, grid):
         """Convert grid to a dict of possible values, {square: digits}, or
         return False if a contradiction is detected."""
         # To start, every square can be any digit; then assign values from the grid.
         values = dict((s, self.digits) for s in self.squares)
-        for s, d in self.grid_values(grid).items():
+        for s, d in self.load_values(grid).items():
             if d in self.digits and not self.assign(values, s, d):
                 return False  # (Fail if we can't assign d to square s.)
         return values
 
-    def grid_values(self, grid):
+    def load_values(self, grid):
         """Convert grid into a dict of {square: char} with '0' or '.' for empties."""
+
+        # convert list of strings to string
+        if isinstance(grid, list):
+            flat_grid = ''
+            for sub_grid in grid:
+                for item in sub_grid:
+                    flat_grid += item
+            grid = flat_grid
+
         chars = [c for c in grid if c in self.digits or c in '0.']
         if len(chars) != 81:
             print(grid, chars, len(chars))
@@ -82,19 +91,6 @@ class Puzzle:
                     return False
         return values
 
-    def display(self, values):
-        """Display these values as a 2-D grid."""
-        width = 1 + max(len(values[s]) for s in self.squares)
-        line = '+'.join(['-' * (width * 3)] * 3)
-        for r in self.rows:
-            print(''.join(values[r + c].center(width) + ('|' if c in '36' else '') for c in self.cols))
-            if r in 'CF':
-                print(line)
-        print()
-
-    def solve(self, grid):
-        return self.search(self.parse_grid(grid))
-
     def search(self, values):
         """Using depth-first search and propagation, try all possible values."""
         if values is False:
@@ -107,3 +103,16 @@ class Puzzle:
             result = self.search(self.assign(values.copy(), s, d))
             if result:
                 return result
+
+    def solve(self, grid):
+        return self.search(self.load_puzzle(grid))
+
+    def display(self, values):
+        """Display these values as a 2-D grid."""
+        width = 1 + max(len(values[s]) for s in self.squares)
+        line = '+'.join(['-' * (width * 3)] * 3)
+        for r in self.rows:
+            print(''.join(values[r + c].center(width) + ('|' if c in '36' else '') for c in self.cols))
+            if r in 'CF':
+                print(line)
+        print()
