@@ -1,25 +1,31 @@
-from typing import Any
-
-
 def cross(list_a, list_b):
+    """Creates a  cross product str of 2 list of str.
+
+    Unlike itertools.product, the str parts are concatenated together.
+
+    Args:
+        list_a (list of str): A list or rows indices (usually).
+        list_b (list of str): A list or columns indices (usually).
+
+    Returns:
+        list of str: the corss product of the strings in the two list arguments.    """
     """Cross product of elements in A and elements in B."""
     return [a + b for a in list_a for b in list_b]
 
 
 class Puzzle:
+    """A basic class for a sudoku puzzle
 
-    # Solve Every Sudoku Puzzle
+    Uses techniques from Peter Norvig's solver.
+    See: http://norvig.com/sudoku.html
 
-    # See http://norvig.com/sudoku.html
-
-    # Throughout this program we have:
-    #   r is a row,    e.g. 'r1'
-    #   c is a column, e.g. 'c3'
-    #   s is a square, e.g. 'r1c3'
-    #   d is a digit,  e.g. '9'
-    #   u is a unit,   e.g. ['r1c1','r2c1','r3c1','r4c1','r5c1','r6c1','r7c1','r8c1','r9c1']
-    #   grid is a grid,e.g. 81 non-blank chars, e.g. starting with '.18...7...
-    #   values is a dict of possible values, e.g. {'r1c1':'12349', 'r1c2':'8', ...}
+    Attributes:
+        rows (list of str): sudoku row indices, e.g. 'r1'.
+        cols (list of str): sudoku column indices, e.g. 'c3'.
+        squares (list of str): sudoku squares indices: e.g. 'r1c3'.
+        digits (str): possible square values, '1' - '9.
+        grid (dict of str: str): the sudoku puzzle grid or values by square.
+    """
 
     def __init__(self):
         super().__init__()
@@ -31,7 +37,14 @@ class Puzzle:
         self.grid = dict((s, None) for s in self.squares)
 
     def load_puzzle(self, definition):
-        """Convert grid into a dict of {square: char} with '.', ' ' or '0' for empties."""
+        """Takes a string or list of strings representation of a puzzle and loads it into the puzzle grid.
+
+        Args:
+            definition (str or list of str): the values for the puzzle.
+
+        Returns:
+            Nothing.
+        """
 
         # convert list of strings to string
         if isinstance(definition, list):

@@ -49,7 +49,7 @@ export class Puzzle {
     }
 
     /**
-     * Takes a string or array of strings representation of a puzzle and loads it into a puzzle dictionary.
+     * Takes a string or array of strings representation of a puzzle and loads it into a puzzle grid.
      *
      * @param definition
      *  The string to load the sudoku board from,
