@@ -1,19 +1,38 @@
+from typing import List
+
 from Puzzle import Puzzle
 from NorvigPuzzleSolver import NorvigPuzzleSolver
 import time
 
 
 def solve_all(definitions, name=''):
-    """Attempt to solve a sequence of grids. Report results."""
+    """Solve multiple puzzle definitions.
+
+    Args:
+        definitions: The puzzle definitions to solve
+        name: A friendly name to print as part of the report
+    """
+    # Attempt to solve a sequence of grids. Report results.
 
     times, results = zip(*[time_solve(definition) for definition in definitions])
     n = len(results)
     if n > 1:
-        print("Solved %d of %d %s puzzles (avg %.2f secs (%d Hz), max %.2f secs)." % (
-            sum(results), n, name, sum(times) / n, n / sum(times), max(times)))
+        total_solutions = sum(results)
+        avg_time = sum(times) / n
+        freq = 1 / avg_time
+        print('\n')
+        print(f'Solved {total_solutions :d} of {n:d} {name} puzzles (avg {avg_time :.2f} secs ({freq:.2f} Hz), max {max(times):.2f} secs).')
 
 
 def time_solve(definition):
+    """
+    Loads and solves a single puzzle, recording the time required.
+    Args:
+        definition: The puzzle to solve.
+
+    Returns:
+        The time to solve and true if successful, false otherwise.
+    """
     p = Puzzle()
     p.load_puzzle(definition)
 
@@ -24,14 +43,25 @@ def time_solve(definition):
 
     t = time.perf_counter() - start
 
-    return t, solved(p, s, values)
+    return t, is_solved(p.digits, s.unit_list, values)
 
 
-def solved(puzzle: Puzzle, solver: NorvigPuzzleSolver, values):
-    """A puzzle is solved if each unit is a permutation of the digits 1 to 9."""
-    def unit_solved(unit): return set(values[s] for s in unit) == set(puzzle.digits)
+def is_solved(puzzle_digits: str, unit_list: List[List[int]], values):
+    """
+    Verifies a set of values is a solution to the puzzle.
+    Args:
+        puzzle_digits: the possible choices for a puzzle square
+        unit_list: a list of units
+        values: a solution to test
 
-    return values is not False and all(unit_solved(unit) for unit in solver.unit_list)
+    Returns:
+        true if solves, false otherwise
+    """
+    # """A puzzle is solved if each unit is a permutation of the digits 1 to 9."""
+
+    def unit_solved(unit): return set(values[s] for s in unit) == set(puzzle_digits)
+
+    return values is not False and all(unit_solved(unit) for unit in unit_list)
 
 
 grid1 = '003020600900305001001806400008102900700000008006708200002609500800203009005010300'
@@ -52,7 +82,6 @@ hard1 = '.....6....59.....82....8....45........3........6..3.54...325..6........
 
 
 def test_puzzle_init():
-
     p = Puzzle()
     assert len(p.squares) == 81
 

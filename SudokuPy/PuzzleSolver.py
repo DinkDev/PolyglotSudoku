@@ -15,7 +15,6 @@ class PuzzleSolver(metaclass=ABCMeta):
         units (dict of str: list of str): every unit_list combination for a square
         peers (dict of str: set of str): every square in a unit for a square (without the square itself).
     """
-
     def __init__(self, p: Puzzle):
         """Initializer.
 

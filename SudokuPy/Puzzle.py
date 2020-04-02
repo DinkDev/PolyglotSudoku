@@ -26,7 +26,6 @@ class Puzzle:
         digits (str): possible square values, '1' - '9.
         grid (dict of str: str): the sudoku puzzle grid or values by square.
     """
-
     def __init__(self):
         super().__init__()
 
@@ -45,7 +44,6 @@ class Puzzle:
         Returns:
             Nothing.
         """
-
         # convert list of strings to string
         if isinstance(definition, list):
             flat_grid = ''
