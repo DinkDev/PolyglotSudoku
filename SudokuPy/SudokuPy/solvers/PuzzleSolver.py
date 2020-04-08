@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from typing import Any
-from Puzzle import Puzzle, cross
+from SudokuPy.Puzzle import Puzzle, cross
 
 
 class PuzzleSolver(metaclass=ABCMeta):

@@ -1,7 +1,7 @@
 from typing import List
 
-from Puzzle import Puzzle
-from NorvigPuzzleSolver import NorvigPuzzleSolver
+from SudokuPy.Puzzle import Puzzle
+from SudokuPy.solvers.NorvigPuzzleSolver import NorvigPuzzleSolver
 import time
 
 
@@ -21,7 +21,9 @@ def solve_all(definitions, name=''):
         avg_time = sum(times) / n
         freq = 1 / avg_time
         print('\n')
-        print(f'Solved {total_solutions :d} of {n:d} {name} puzzles (avg {avg_time :.2f} secs ({freq:.2f} Hz), max {max(times):.2f} secs).')
+        # print(f'Solved {total_solutions :d} of {n:d} {name} puzzles (avg {avg_time :.2f} secs ({freq:.2f} Hz), max {max(times):.2f} secs).')
+        print(f'Solved {total_solutions :d} of {n:d} {name} puzzles (avg {avg_time :.2f} secs'
+              f' ({freq:.2f} Hz), max {max(times):.2f} secs).')
 
 
 def time_solve(definition):
@@ -57,6 +59,7 @@ def is_solved(puzzle_digits: str, unit_list: List[List[int]], values):
     Returns:
         true if solves, false otherwise
     """
+
     # """A puzzle is solved if each unit is a permutation of the digits 1 to 9."""
 
     def unit_solved(unit): return set(values[s] for s in unit) == set(puzzle_digits)
@@ -79,11 +82,6 @@ grid2d = [
     '1.4......',
 ]
 hard1 = '.....6....59.....82....8....45........3........6..3.54...325..6..................'
-
-
-def test_puzzle_init():
-    p = Puzzle()
-    assert len(p.squares) == 81
 
 
 def test_puzzle_solver_init():

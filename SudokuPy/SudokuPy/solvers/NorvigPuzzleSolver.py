@@ -1,4 +1,4 @@
-from PuzzleSolver import PuzzleSolver
+from SudokuPy.solvers.PuzzleSolver import PuzzleSolver
 
 
 class NorvigPuzzleSolver(PuzzleSolver):
