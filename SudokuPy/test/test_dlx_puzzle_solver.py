@@ -1,7 +1,7 @@
 from typing import List
 
 from SudokuPy.Puzzle import Puzzle
-from SudokuPy.solvers.NorvigPuzzleSolver import NorvigPuzzleSolver
+from SudokuPy.solvers.DlxPuzzleSolver import DlxPuzzleSolver
 import time
 
 
@@ -44,19 +44,19 @@ def time_solve(definition):
 
     start = time.perf_counter()
 
-    s = NorvigPuzzleSolver(p)
-    values = s.solve()
+    s = DlxPuzzleSolver(p)
+    values = [solution for solution in s.solve()]
 
     t = time.perf_counter() - start
 
     return t, is_solved(p.digits, s.unit_list, values)
 
 
-def is_solved(puzzle_digits: str, unit_list: List[List[str]], values):
+def is_solved(all_puzzle_values: str, unit_list: List[List[str]], values):
     """
     Verifies a set of values is a solution to the puzzle.
     Args:
-        puzzle_digits: the possible choices for a puzzle square
+        all_puzzle_values: the possible choices for a puzzle square
         unit_list: a list of units
         values: a solution to test
 
@@ -64,11 +64,17 @@ def is_solved(puzzle_digits: str, unit_list: List[List[str]], values):
         true if solves, false otherwise
     """
 
-    # """A puzzle is solved if each unit is a permutation of the digits 1 to 9."""
+    # """A puzzle is solved if each unit is a permutation of all the possible values (usually 1 to 9)."""
+    all_values = set(d for d in all_puzzle_values)
 
-    def unit_solved(unit): return set(values[s] for s in unit) == set(puzzle_digits)
+    if len(values) == 1 and values[0] is not False:
+        def unit_solved(unit):
+            return set(values[0].grid[s] for s in unit) == all_values
 
-    return values is not False and all(unit_solved(unit) for unit in unit_list)
+        return all(unit_solved(unit) for unit in unit_list)
+
+    else:
+        return False
 
 
 grid1 = '003020600900305001001806400008102900700000008006708200002609500800203009005010300'
@@ -92,7 +98,7 @@ invalid1 = '.....6....59.....82....8....45........3........6..3.54...325..6.....
 
 def test_puzzle_solver_init():
     puzzle = Puzzle()
-    solver = NorvigPuzzleSolver(puzzle)
+    solver = DlxPuzzleSolver(puzzle)
     assert len(solver.unit_list) == 27
     assert all(len(solver.units[s]) == 3 for s in puzzle.squares)
     assert all(len(solver.peers[s]) == 20 for s in puzzle.squares)
@@ -126,7 +132,7 @@ def test_hard1():
 
 
 def test_invalid1():
-    solve_all([hard1], "invalid1")  # Norvig's solver yields a solution, but there are many
+    solve_all([invalid1], "invalid1")
 
 
 def test_solve_easy():

@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any
+from typing import Any, List
 from SudokuPy.Puzzle import Puzzle, cross
 
 
@@ -15,6 +15,8 @@ class PuzzleSolver(metaclass=ABCMeta):
         units (dict of str: list of str): every unit_list combination for a square
         peers (dict of str: set of str): every square in a unit for a square (without the square itself).
     """
+    unit_list: List[List[str]]
+
     def __init__(self, p: Puzzle):
         """Initializer.
 

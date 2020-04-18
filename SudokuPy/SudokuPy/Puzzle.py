@@ -29,11 +29,30 @@ class Puzzle:
     def __init__(self):
         super().__init__()
 
+# TODO: need to parameterize this, digits should be driven by definition!
         self.digits = '123456789'
+        self.size = len(self.digits)
         self.rows = ['r' + d for d in self.digits]
         self.cols = ['c' + d for d in self.digits]
         self.squares = cross(self.rows, self.cols)
         self.grid = dict((s, None) for s in self.squares)
+
+    def __iter__(self):
+        """Iterator implementation to loop through rows of the puzzle
+
+        Returns:
+            The grid values for each row in an iteration.
+        """
+        self.row_iter = 0
+        return self
+
+    def __next__(self):
+        if self.row_iter <= len(self.rows):
+            curr_row = self.rows[self.row_iter]
+            self.row_iter += 1
+            return [self.grid[curr_row + col] for col in self.cols]
+        else:
+            raise StopIteration
 
     def load_puzzle(self, definition):
         """Takes a string or list of strings representation of a puzzle and loads it into the puzzle grid.
