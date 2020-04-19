@@ -1,46 +1,68 @@
 from itertools import product
 import math
+from typing import Dict, List, Tuple, Union
 
 from SudokuPy.Puzzle import Puzzle
 from SudokuPy.solvers.PuzzleSolver import PuzzleSolver
 
 
 class DlxPuzzleSolver(PuzzleSolver):
+    """
+    DLX support - inspired by Ali Assaf's Algorithm X in 30 lines! [1]
+    [1]: URL https://www.cs.mcgill.ca/~aassaf9/python/algorithm_x.html
+    """
+    def __init__(self, p: Puzzle):
+        """Initializer.
 
-    def solve(self):
-        """ An efficient Sudoku solver using Algorithm x.
+        Sets up the DLX constraints
+        there are constraints that:
+        - in each cell must be exactly one number
+        - in each row must be all numbers
+        - in each column must be all numbers
+        - in each box must be all numbers
 
-        # """
-        # setup constraints
-        # there are constraints that:
-        # - in each cell must be exactly one number
-        # - in each row must be all numbers
-        # - in each column must be all numbers
-        # - in each box must be all numbers
-        x = [s for s in product(['cell', 'row', 'column', 'box'],
-                                [v for v in product(range(1, self.puzzle.size + 1), range(1, self.puzzle.size + 1))])]
+        Args:
+            p (Puzzle): the Puzzle to be solved.
+        """
+        super().__init__(p)
+
+        self.x = {c: set() for c in product(
+            ['cell', 'row', 'column', 'box'],
+            [v for v in product(range(1, self.puzzle.size + 1), range(1, self.puzzle.size + 1))])}
 
         box_size = int(math.sqrt(self.puzzle.size))
-        y = {}
+        self.y = {}
         for r, c, n in product(range(1, self.puzzle.size + 1), range(1, self.puzzle.size + 1),
                                range(1, self.puzzle.size + 1)):
             b = ((r - 1) // box_size) * box_size + ((c - 1) // box_size) + 1
-            y[(f'r{r}c{c}', f'{n}')] = [
+            self.y[(f'r{r}c{c}', f'{n}')] = [
                 ("cell", (r, c)),
                 ("row", (r, n)),
                 ("column", (c, n)),
                 ("box", (b, n))]
-        x, y = self.exact_cover(x, y)
+        # x = {j: set() for j in x}  # convert x to a dict via comprehension
+        for i1, row in self.y.items():
+            for j in row:
+                self.x[j].add(i1)
+        result1 = self.x, self.y
+        self.x, y = result1
 
         # load grid
         for i in self.puzzle.grid:
             v = self.puzzle.grid[i]
             if v:
-                self.select(x, y, (i, v))
+                self.cover(self.x, y, (i, v))
 
-        # solve puzzle, note that multiple solutions is an invalid puzzle
+    def solve(self) -> Union[Puzzle, None]:
+        """Main entry point for using DLX to solve a sudoku.
+
+        Note that multiple solutions is an invalid puzzle!
+
+        Returns:
+            One or more solutions in a Puzzle
+        """
         solution_count = 0
-        for solution in self.get_solutions(x, y, []):
+        for solution in self.recursive_solve(self.x, self.y, []):
             solution_count += 1
             if solution_count > 2:
                 return
@@ -57,29 +79,47 @@ class DlxPuzzleSolver(PuzzleSolver):
 
             yield result
 
-    @staticmethod
-    def exact_cover(x, y):
-        x = {j: set() for j in x}  # convert x to a dict via comprehension
-        for i, row in y.items():
-            for j in row:
-                x[j].add(i)
-        return x, y
+    def recursive_solve(self,
+                        x: Dict[Tuple[str, Tuple[int, int]], set],
+                        y: Dict[Tuple[str, str], List[Tuple[str, Tuple[int, int]]]],
+                        solutions: List[Tuple[str, str]]) -> Union[List[Tuple[str, str]], None]:
+        """ Implements the DLX solution algorithm
 
-    def get_solutions(self, x, y, solution):
+        Args:
+            x: The DLX nodes
+            y: The DLX row headers
+            solutions: Buffer for solutions
+
+        Returns:
+            Solutions from deeper recursion
+        """
         if not x:
-            yield list(solution)
+            yield list(solutions)
         else:
             c = min(x, key=lambda i: len(x[i]))
             for r in list(x[c]):
-                solution.append(r)
-                cols = self.select(x, y, r)
-                for s in self.get_solutions(x, y, solution):
+                solutions.append(r)
+                # put the covered columns on the stack
+                cols = self.cover(x, y, r)
+                for s in self.recursive_solve(x, y, solutions):
                     yield s
-                self.deselect(x, y, r, cols)
-                solution.pop()
+                self.uncover(x, y, r, cols)
+                solutions.pop()
 
     @staticmethod
-    def select(x, y, r):
+    def cover(x: Dict[Tuple[str, Tuple[int, int]], set],
+              y: Dict[Tuple[str, str], List[Tuple[str, Tuple[int, int]]]],
+              r: Tuple[str, str]) -> List[set]:
+        """ DLX cover method - try a solution
+
+        Args:
+            x: The DLX nodes
+            y: The DLX row headers
+            r: The DLX row to eliminate
+
+        Returns:
+            The DLX nodes from the column eliminated
+        """
         cols = []
         for j in y[r]:
             for i in x[j]:
@@ -90,7 +130,21 @@ class DlxPuzzleSolver(PuzzleSolver):
         return cols
 
     @staticmethod
-    def deselect(x, y, r, cols):
+    def uncover(x: Dict[Tuple[str, Tuple[int, int]], set],
+                y: Dict[Tuple[str, str], List[Tuple[str, Tuple[int, int]]]],
+                r: Tuple[str, str],
+                cols: List[set]):
+        """ DLX uncover method - restores a row header and column nodes to the model.
+
+        Args:
+            x: The DLX nodes
+            y: The DLX row headers
+            r: The DLX row to restore
+            cols: The DLX nodes from the column restored
+
+        Returns:
+            None
+        """
         for j in reversed(y[r]):
             x[j] = cols.pop()
             for i in x[j]:
