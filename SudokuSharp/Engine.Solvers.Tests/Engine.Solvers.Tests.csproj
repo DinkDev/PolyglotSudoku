@@ -5,9 +5,9 @@
 
     <IsPackable>false</IsPackable>
 
-    <AssemblyName>SudokuSharp.Engine.Tests</AssemblyName>
+    <RootNamespace>SudokuSharp.Engine.Solvers.Tests</RootNamespace>
 
-    <RootNamespace>SudokuSharp.Engine.Tests</RootNamespace>
+    <AssemblyName>SudokuSharp.Engine.Solvers.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Engine.Solvers\Engine.Solvers.csproj" />
     <ProjectReference Include="..\Engine\Engine.csproj" />
   </ItemGroup>
 

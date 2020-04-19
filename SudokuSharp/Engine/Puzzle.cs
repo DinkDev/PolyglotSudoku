@@ -41,7 +41,7 @@ namespace SudokuSharp.Engine
         {
             // no null check because it is private.
 
-            LoadPuzzle(other.ToString());
+            LoadPuzzle(other.AsText());
         }
 
         /// <summary>
@@ -203,13 +203,16 @@ namespace SudokuSharp.Engine
         }
 
         /// <summary>
-        ///     Dumps this puzzle as a string.
+        /// Dumps this puzzle as a string.
         /// </summary>
+        /// <remarks>
+        ///Named AsText in order to allow full list of default arguments without conflicting with <see cref="ToString"/>
+        /// </remarks>
         /// <param name="nullChar"></param>
         /// <param name="newLinePerRow">If true, adds newline characters for each row string</param>
         /// <param name="upperCase">If true, will return all hex-plus characters in uppercase</param>
         /// <returns>This NullableByte puzzle as a string</returns>
-        public string ToString(char nullChar = '.', bool newLinePerRow = false, bool upperCase = false)
+        public string AsText(char nullChar = '.', bool newLinePerRow = false, bool upperCase = false)
         {
             var rv = new StringBuilder();
             foreach (var row in this.ByRow())
@@ -228,6 +231,12 @@ namespace SudokuSharp.Engine
             }
 
             return rv.ToString();
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return AsText(newLinePerRow: true);
         }
 
         /// <summary>

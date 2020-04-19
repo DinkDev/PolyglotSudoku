@@ -4,9 +4,12 @@ namespace SudokuSharp.Engine.Tests
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
+    using ApprovalTests;
+    using ApprovalTests.Reporters;
     using Xunit;
     using Xunit.Abstractions;
 
+    [UseReporter(typeof(BeyondCompareReporter))]
     public class PuzzleTests
     {
         public PuzzleTests(ITestOutputHelper helper)
@@ -211,20 +214,15 @@ namespace SudokuSharp.Engine.Tests
             var sut = new Puzzle(PuzzleSize.FourByFour);
 
             var result = sut.LoadPuzzle(puzzleStrings);
-            var resultLines = sut.ToString(newLinePerRow: true);
+            var resultLines = sut.AsText(newLinePerRow: true);
 
-            TestContext.WriteLine(sut.ToString(newLinePerRow: true));
+            TestContext.WriteLine(sut.AsText(newLinePerRow: true));
 
             Assert.True(result);
             Assert.Equal(actualLines, resultLines);
             Assert.Equal(PuzzleStatus.InProgress, sut.GetPuzzleStatus());
 
-            Assert.Equal(1, sut[new PuzzleCoordinate(0, 0)] ?? -1);
-            Assert.Equal(2, sut[new PuzzleCoordinate(0, 1)] ?? -1);
-            Assert.Equal(1, sut[new PuzzleCoordinate(1, 2)] ?? -1);
-            Assert.Equal(3, sut[new PuzzleCoordinate(2, 1)] ?? -1);
-            Assert.Equal(3, sut[new PuzzleCoordinate(3, 2)] ?? -1);
-            Assert.Equal(4, sut[new PuzzleCoordinate(3, 3)] ?? -1);
+            Approvals.Verify(sut);
         }
 
         [Fact]
@@ -254,7 +252,7 @@ namespace SudokuSharp.Engine.Tests
             var sut = new Puzzle(PuzzleSize.SixteenBySixteen);
 
             var result = sut.LoadPuzzle(puzzleStrings);
-            var resultLines = sut.ToString(newLinePerRow: true, upperCase: true);
+            var resultLines = sut.AsText(newLinePerRow: true, upperCase: true);
 
             TestContext.WriteLine(resultLines);
 
@@ -263,12 +261,7 @@ namespace SudokuSharp.Engine.Tests
 
             Assert.Equal(PuzzleStatus.InProgress, sut.GetPuzzleStatus());
 
-            Assert.Equal(9, sut[new PuzzleCoordinate(0, 0)] ?? -1);
-            Assert.Equal(3, sut[new PuzzleCoordinate(0, 15)] ?? -1);
-            Assert.Equal(4, sut[new PuzzleCoordinate(8, 2)] ?? -1);
-            Assert.Equal(10, sut[new PuzzleCoordinate(8, 8)] ?? -1);
-            Assert.Equal(16, sut[new PuzzleCoordinate(14, 11)] ?? -1);
-            Assert.Equal(15, sut[new PuzzleCoordinate(15, 0)] ?? -1);
+            Approvals.Verify(sut);
         }
 
         [Fact]
@@ -280,15 +273,15 @@ namespace SudokuSharp.Engine.Tests
             var sut = new Puzzle(PuzzleSize.NineByNine);
 
             var result = sut.LoadPuzzle(puzzleStrings);
-            var resultLines = sut.ToString(newLinePerRow: true);
+            var resultLines = sut.AsText(newLinePerRow: true);
 
-            TestContext.WriteLine(sut.ToString(newLinePerRow: true));
+            TestContext.WriteLine(sut.AsText(newLinePerRow: true));
 
             Assert.True(result);
             Assert.Equal(actualLines, resultLines);
             Assert.Equal(PuzzleStatus.InProgress, sut.GetPuzzleStatus());
 
-            CheckPuzzle1(sut);
+            Approvals.Verify(sut);
         }
 
         [Fact]
@@ -296,20 +289,20 @@ namespace SudokuSharp.Engine.Tests
         {
             var puzzleStrings = GetPuzzle1();
             var actualLines = puzzleStrings.Aggregate((current, next) => current + Environment.NewLine + next);
-            var puzzleText = puzzleStrings.Aggregate((current, nect) => current + nect);
+            var puzzleText = puzzleStrings.Aggregate((current, next) => current + next);
 
             var sut = new Puzzle(PuzzleSize.NineByNine);
 
             var result = sut.LoadPuzzle(puzzleText);
-            var resultLines = sut.ToString(newLinePerRow: true);
+            var resultLines = sut.AsText(newLinePerRow: true);
 
-            TestContext.WriteLine(sut.ToString(newLinePerRow: true));
+            TestContext.WriteLine(sut.AsText(newLinePerRow: true));
 
             Assert.True(result);
             Assert.Equal(actualLines, resultLines);
             Assert.Equal(PuzzleStatus.InProgress, sut.GetPuzzleStatus());
 
-            CheckPuzzle1(sut);
+            Approvals.Verify(sut);
         }
 
         [Fact]
@@ -317,7 +310,7 @@ namespace SudokuSharp.Engine.Tests
         {
             var puzzleStrings = GetPuzzle1();
             var actualLines = puzzleStrings.Aggregate((current, next) => current + Environment.NewLine + next);
-            var puzzleText = puzzleStrings.Aggregate((current, nect) => current + nect);
+            var puzzleText = puzzleStrings.Aggregate((current, next) => current + next);
             var sb = new StringBuilder();
 
             foreach (var itemChar in puzzleText)
@@ -328,15 +321,15 @@ namespace SudokuSharp.Engine.Tests
             var sut = new Puzzle(PuzzleSize.NineByNine);
 
             var result = sut.LoadPuzzle(sb.ToString());
-            var resultLines = sut.ToString(newLinePerRow: true);
+            var resultLines = sut.AsText(newLinePerRow: true);
 
-            TestContext.WriteLine(sut.ToString(newLinePerRow: true));
+            TestContext.WriteLine(sut.AsText(newLinePerRow: true));
 
             Assert.True(result);
             Assert.Equal(actualLines, resultLines);
             Assert.Equal(PuzzleStatus.InProgress, sut.GetPuzzleStatus());
 
-            CheckPuzzle1(sut);
+            Approvals.Verify(sut);
         }
 
         [Fact]
@@ -349,7 +342,7 @@ namespace SudokuSharp.Engine.Tests
 
             var result = sut.LoadPuzzle(puzzleText, GetPuzzle1Translation());
 
-            TestContext.WriteLine(sut.ToString(newLinePerRow: true));
+            TestContext.WriteLine(sut.AsText(newLinePerRow: true));
 
             Assert.True(result);
             Assert.Equal(PuzzleStatus.InProgress, sut.GetPuzzleStatus());
@@ -384,20 +377,20 @@ namespace SudokuSharp.Engine.Tests
                 select cell).Count();
             Assert.Equal(expectedCount, cellCount);
 
-            var resultLines = sut.ToString(newLinePerRow: true);
+            var resultLines = sut.AsText(newLinePerRow: true);
 
-            TestContext.WriteLine(sut.ToString(newLinePerRow: true));
+            TestContext.WriteLine(sut.AsText(newLinePerRow: true));
 
             Assert.Equal(actualLines.Aggregate((c, n) => c + Environment.NewLine + n), resultLines);
             Assert.Equal(PuzzleStatus.InProgress, sut.GetPuzzleStatus());
 
             Assert.True(sut.ComparePuzzle(orig));
 
-            CheckPuzzle1(sut);
+            Approvals.Verify(sut);
         }
 
         [Fact]
-        public void Puzzle_ToString_Test1()
+        public void Puzzle_AsText_Test1()
         {
             var puzzleStrings = GetPuzzle1();
             var actualText = puzzleStrings.Aggregate((current, next) => current + next);
@@ -405,19 +398,19 @@ namespace SudokuSharp.Engine.Tests
             var sut = new Puzzle(PuzzleSize.NineByNine);
 
             var result = sut.LoadPuzzle(puzzleStrings);
-            var resultText = sut.ToString();
+            var resultText = sut.AsText();
 
-            TestContext.WriteLine(sut.ToString(newLinePerRow: true));
+            TestContext.WriteLine(sut.AsText(newLinePerRow: true));
 
             Assert.True(result);
             Assert.Equal(actualText, resultText);
             Assert.Equal(PuzzleStatus.InProgress, sut.GetPuzzleStatus());
 
-            CheckPuzzle1(sut);
+            Approvals.Verify(sut);
         }
 
         [Fact]
-        public void Puzzle_ToString_Test2()
+        public void Puzzle_AsText_Test2()
         {
             var puzzleStrings = GetPuzzle1();
             var actualLines = puzzleStrings.Aggregate((current, next) => current + Environment.NewLine + next);
@@ -425,23 +418,23 @@ namespace SudokuSharp.Engine.Tests
             var sut = new Puzzle(PuzzleSize.NineByNine);
 
             var result = sut.LoadPuzzle(puzzleStrings);
-            var resultText = sut.ToString(newLinePerRow: true);
+            var resultText = sut.AsText(newLinePerRow: true);
 
-            TestContext.WriteLine(sut.ToString(newLinePerRow: true));
+            TestContext.WriteLine(sut.AsText(newLinePerRow: true));
 
             Assert.True(result);
             Assert.Equal(actualLines, resultText);
             Assert.Equal(PuzzleStatus.InProgress, sut.GetPuzzleStatus());
 
-            CheckPuzzle1(sut);
+            Approvals.Verify(sut);
         }
 
         [Fact]
-        public void Puzzle_ToString_Test3()
+        public void Puzzle_AsText_Test3()
         {
             var puzzleStrings = GetPuzzle1();
 
-            var puzzleText = puzzleStrings.Aggregate((current, nect) => current + nect);
+            var puzzleText = puzzleStrings.Aggregate((current, next) => current + next);
             var sb = new StringBuilder();
 
             foreach (var itemChar in puzzleText)
@@ -452,15 +445,15 @@ namespace SudokuSharp.Engine.Tests
             var sut = new Puzzle(PuzzleSize.NineByNine);
 
             var result = sut.LoadPuzzle(sb.ToString());
-            var resultLines = sut.ToString(' ');
+            var resultLines = sut.AsText(' ');
 
-            TestContext.WriteLine(sut.ToString(newLinePerRow: true));
+            TestContext.WriteLine(sut.AsText(newLinePerRow: true));
 
             Assert.True(result);
             Assert.Equal(sb.ToString(), resultLines);
             Assert.Equal(PuzzleStatus.InProgress, sut.GetPuzzleStatus());
 
-            CheckPuzzle1(sut);
+            Approvals.Verify(sut);
         }
 
         [Fact]
@@ -472,7 +465,7 @@ namespace SudokuSharp.Engine.Tests
         }
 
         [Fact]
-        public void Puzzle_PrpertyChangedIsNotified_test1()
+        public void Puzzle_PropertyChangedIsNotified_test1()
         {
             var sut = new Puzzle();
             var wasSet = new List<string>();
@@ -498,45 +491,6 @@ namespace SudokuSharp.Engine.Tests
                 "7.1.2...8"
             };
             return puzzleStrings;
-        }
-
-        private void CheckPuzzle1(Puzzle sut)
-        {
-            Assert.Equal(6, sut[new PuzzleCoordinate(0, 0)] ?? -1);
-            Assert.Equal(5, sut[new PuzzleCoordinate(0, 4)] ?? -1);
-            Assert.Equal(3, sut[new PuzzleCoordinate(0, 6)] ?? -1);
-            Assert.Equal(1, sut[new PuzzleCoordinate(0, 8)] ?? -1);
-
-            Assert.Equal(4, sut[new PuzzleCoordinate(1, 0)] ?? -1);
-            Assert.Equal(5, sut[new PuzzleCoordinate(1, 1)] ?? -1);
-            Assert.Equal(9, sut[new PuzzleCoordinate(1, 2)] ?? -1);
-            Assert.Equal(7, sut[new PuzzleCoordinate(1, 3)] ?? -1);
-
-            Assert.Equal(1, sut[new PuzzleCoordinate(2, 1)] ?? -1);
-            Assert.Equal(9, sut[new PuzzleCoordinate(2, 4)] ?? -1);
-            Assert.Equal(4, sut[new PuzzleCoordinate(2, 6)] ?? -1);
-
-            Assert.Equal(6, sut[new PuzzleCoordinate(3, 7)] ?? -1);
-
-            Assert.Equal(8, sut[new PuzzleCoordinate(4, 3)] ?? -1);
-            Assert.Equal(4, sut[new PuzzleCoordinate(4, 4)] ?? -1);
-            Assert.Equal(9, sut[new PuzzleCoordinate(4, 5)] ?? -1);
-
-            Assert.Equal(7, sut[new PuzzleCoordinate(5, 1)] ?? -1);
-
-            Assert.Equal(3, sut[new PuzzleCoordinate(6, 2)] ?? -1);
-            Assert.Equal(7, sut[new PuzzleCoordinate(6, 4)] ?? -1);
-            Assert.Equal(1, sut[new PuzzleCoordinate(6, 7)] ?? -1);
-
-            Assert.Equal(5, sut[new PuzzleCoordinate(7, 5)] ?? -1);
-            Assert.Equal(6, sut[new PuzzleCoordinate(7, 6)] ?? -1);
-            Assert.Equal(3, sut[new PuzzleCoordinate(7, 7)] ?? -1);
-            Assert.Equal(7, sut[new PuzzleCoordinate(7, 8)] ?? -1);
-
-            Assert.Equal(7, sut[new PuzzleCoordinate(8, 0)] ?? -1);
-            Assert.Equal(1, sut[new PuzzleCoordinate(8, 2)] ?? -1);
-            Assert.Equal(2, sut[new PuzzleCoordinate(8, 4)] ?? -1);
-            Assert.Equal(8, sut[new PuzzleCoordinate(8, 8)] ?? -1);
         }
 
         /// <summary>
