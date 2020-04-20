@@ -1,7 +1,7 @@
 import * as Collections from 'typescript-collections';
 import { PuzzleSize, PuzzleSizeUtil } from './PuzzleSize';
 
-export type cellType = number | null;
+export type cellType = string | null;
 
 export class Puzzle {
     public puzzleSize: PuzzleSize = PuzzleSize.Undefined;
@@ -102,16 +102,16 @@ export class Puzzle {
      * @returns true is valid, false otherwise.
      */
     public parseRow(rowString: string, r: number) {
-
-        // todo: may want to support hex+'g' for order of 16!
+        const regexp = /^[a-g1-9]$/i;   // supports hex+'g'
 
         for (let c = 0; c < this.puzzleSize; c++) {
             const cellString: string = rowString.slice(c, c + 1);
-            const cellNumber: number = Number(cellString);
-            if (isNaN(cellNumber)) {
+            const isCellValue = regexp.test(cellString);
+
+            if (! isCellValue) {
                 this.grid.setValue(`r${r}c${c}`, null);
             } else {
-                this.grid.setValue(`r${r}c${c}`, cellNumber);
+                this.grid.setValue(`r${r}c${c}`, cellString);
             }
         }
     }
@@ -124,9 +124,7 @@ export class Puzzle {
 
         for (let rIndex: number = 0; rIndex < this.puzzleSize; rIndex++) {
             for (let cIndex: number = 0; cIndex < this.puzzleSize; cIndex++) {
-                // rv += this.convertToChar(this.grid[rIndex][cIndex]);
                 rv += this.convertToChar(this.grid.getValue(`r${rIndex}c${cIndex}`));
-
             }
         }
 
@@ -140,11 +138,7 @@ export class Puzzle {
      */
     public convertToChar(cellValue: cellType | undefined): string {
         if (cellValue) {
-            if (cellValue > 0 && cellValue < 16) {
-                return cellValue.toString(16);
-            } else if (cellValue === 16) {
-                return 'g';
-            }
+            return cellValue;
         }
         return this.NullChar;
     }
@@ -192,22 +186,5 @@ export class Puzzle {
         });
 
         return validCellCounts.contains(boardCellCount);
-    }
-
-    /**
-     * Evaluates cellCount to determine if it is a valid cell value for a Sudoku board.
-     *
-     * @param cellValue: the new value for a cell.
-     *
-     * @returns: the value if valid, null otherwise.
-     */
-    public getCellValue(cellValue: number): cellType {
-        let rv = null;
-
-        // todo: should evaluate if it is in range of the puzzleSize
-        if (cellValue > 0) {
-            rv = cellValue;
-        }
-        return rv;
     }
 }

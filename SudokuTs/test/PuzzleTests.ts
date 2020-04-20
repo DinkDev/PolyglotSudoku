@@ -33,10 +33,10 @@ describe('Puzzle constructor', () => {
 
         const sut = new Puzzle(other);
         expect(sut.puzzleSize).to.equal(PuzzleSize.NineByNine);
-        expect(sut.grid.getValue('r0c0')).to.equal(4);
+        expect(sut.grid.getValue('r0c0')).to.equal('4');
         expect(sut.grid.getValue('r0c1')).to.equal(null);
-        expect(sut.grid.getValue('r4c4')).to.equal(3);
-        expect(sut.grid.getValue('r8c8')).to.equal(2);
+        expect(sut.grid.getValue('r4c4')).to.equal('3');
+        expect(sut.grid.getValue('r8c8')).to.equal('2');
     });
 
 });
@@ -50,10 +50,10 @@ describe('Puzzle.parse', () => {
         sut.loadPuzzle(boardDef);
 
         expect(sut.puzzleSize).to.equal(9);
-        expect(sut.grid.getValue('r0c0')).to.equal(4);
+        expect(sut.grid.getValue('r0c0')).to.equal('4');
         expect(sut.grid.getValue('r0c1')).to.equal(null);
-        expect(sut.grid.getValue('r4c4')).to.equal(3);
-        expect(sut.grid.getValue('r8c8')).to.equal(2);
+        expect(sut.grid.getValue('r4c4')).to.equal('3');
+        expect(sut.grid.getValue('r8c8')).to.equal('2');
     });
 
     it('args === string[] parses 9 rows of 9 characters', () => {
@@ -73,10 +73,10 @@ describe('Puzzle.parse', () => {
         sut.loadPuzzle(boardDef);
 
         expect(sut.puzzleSize).to.equal(PuzzleSize.NineByNine);
-        expect(sut.grid.getValue('r0c0')).to.equal(4);
+        expect(sut.grid.getValue('r0c0')).to.equal('4');
         expect(sut.grid.getValue('r0c1')).to.equal(null);
-        expect(sut.grid.getValue('r4c4')).to.equal(3);
-        expect(sut.grid.getValue('r8c8')).to.equal(2);
+        expect(sut.grid.getValue('r4c4')).to.equal('3');
+        expect(sut.grid.getValue('r8c8')).to.equal('2');
     });
 
 });

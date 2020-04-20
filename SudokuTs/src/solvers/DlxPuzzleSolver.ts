@@ -46,7 +46,7 @@ export class DlxPuzzleSolver {
     this.puzzle.grid.keys().forEach(i => {
       const v = this.puzzle.grid.getValue(i);
       if (v !== null && v !== undefined) {
-        this.cover(this.x, this.y, [i, `${v}`]);  // TODO: puzzle values need to be char values
+        this.cover(this.x, this.y, [i, v]);
       }
     });
   }
