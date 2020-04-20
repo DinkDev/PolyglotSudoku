@@ -32,7 +32,8 @@ class DlxPuzzleSolver(PuzzleSolver):
 
         box_size = int(math.sqrt(self.puzzle.size))
         self.y = {}
-        for r, c, n in product(range(1, self.puzzle.size + 1), range(1, self.puzzle.size + 1),
+        for r, c, n in product(range(1, self.puzzle.size + 1),
+                               range(1, self.puzzle.size + 1),
                                range(1, self.puzzle.size + 1)):
             b = ((r - 1) // box_size) * box_size + ((c - 1) // box_size) + 1
             self.y[(f'r{r}c{c}', f'{n}')] = [
@@ -40,18 +41,16 @@ class DlxPuzzleSolver(PuzzleSolver):
                 ("row", (r, n)),
                 ("column", (c, n)),
                 ("box", (b, n))]
-        # x = {j: set() for j in x}  # convert x to a dict via comprehension
-        for i1, row in self.y.items():
+
+        for i, row in self.y.items():
             for j in row:
-                self.x[j].add(i1)
-        result1 = self.x, self.y
-        self.x, y = result1
+                self.x[j].add(i)
 
         # load grid
         for i in self.puzzle.grid:
             v = self.puzzle.grid[i]
             if v:
-                self.cover(self.x, y, (i, v))
+                self.cover(self.x, self.y, (i, v))
 
     def solve(self) -> Union[Puzzle, None]:
         """Main entry point for using DLX to solve a sudoku.
