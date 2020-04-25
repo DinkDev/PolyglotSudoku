@@ -51,6 +51,77 @@ export class DlxPuzzleSolver {
         });
     }
 
+    public solve(): Puzzle[] {
+        const solutions = new Array<Puzzle>();
+
+        for (const solution of this.recursiveSolve(this.x, this.y, new Array<[string, string]>())) {
+                if (solutions.length >= 2) {
+                    return solutions;
+                }
+                // solution is a partial puzzle grid with only the name value pairs for the unknown cells
+
+                // create a result that is a copy of the original puzzle
+                const result = new Puzzle(this.puzzle);
+
+                // then add the solution to it
+                for (const s in solution) {
+                    if (s !== undefined) {
+                        const [i, n] = s;
+                        result.grid.setValue(i, n);
+                    }
+                }
+
+                solutions.push(result);
+            }
+
+        return solutions;
+    }
+
+    private *recursiveSolve(
+        x: Collections.Dictionary<[string, [number, number]], Collections.Set<[string, string]>>,
+        y: Collections.Dictionary<[string, string], Array<[string, [number, number]]>>,
+        solution: Array<[string, string]>): Generator<Array<[string, string]>> {
+
+        if (x.isEmpty()) {
+            yield solution;
+        } else {
+            // find smallest set in x
+
+            // this finds smallest set size
+            const minSetSize = Math.min.apply(x.forEach(p => {
+                x.getValue(p)?.size();
+            }));
+
+            let c: [string, [number, number]] | undefined;
+            x.keys().forEach(i => {
+                if (x.getValue(i)?.size() === minSetSize) {
+                    c = i;
+                }
+            });
+
+            if (c !== undefined) {
+                const xSets: Array<[string, string]>|undefined = x.getValue(c)?.toArray();
+                if (xSets !== undefined) {
+                    // tslint:disable-next-line: prefer-for-of
+                    for (let i = 0; i < xSets.length; i++) {
+                        const r  = xSets[i];
+                        solution.push(r);
+                        // put the covered columns on the stack
+                        const cols = this.cover(x, y, r);
+                        // tslint:disable-next-line: forin
+                        const values = [...this.recursiveSolve(x, y, solution)];
+                        // tslint:disable-next-line: prefer-for-of
+                        for (let j = 0; j < values.length; j++) {
+                            yield values[j];
+                        }
+                        this.uncover(x, y, r, cols);
+                        solution.pop();
+                    }
+                }
+            }
+        }
+    }
+
     private cover(
         x: Collections.Dictionary<[string, [number, number]], Collections.Set<[string, string]>>,
         y: Collections.Dictionary<[string, string], Array<[string, [number, number]]>>,

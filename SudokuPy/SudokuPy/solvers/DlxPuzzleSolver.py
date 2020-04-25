@@ -95,6 +95,7 @@ class DlxPuzzleSolver(PuzzleSolver):
         if not x:
             yield list(solutions)
         else:
+            # find smallest collection in x
             c = min(x, key=lambda i: len(x[i]))
             for r in list(x[c]):
                 solutions.append(r)
