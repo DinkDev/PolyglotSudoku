@@ -6,8 +6,8 @@ import { product2, product3, range } from './IterationUtils';
 export class DlxPuzzleSolver {
     public puzzle: Puzzle;
 
-    private x: Collections.Dictionary<[string, [number, number]], Collections.Set<[string, string]>>
-        = new Collections.Dictionary<[string, [number, number]], Collections.Set<[string, string]>>();
+    private x: Collections.Dictionary<[string, [number, number]], Set<[string, string]>>
+        = new Collections.Dictionary<[string, [number, number]], Set<[string, string]>>();
     private y: Collections.Dictionary<[string, string], Array<[string, [number, number]]>>
         = new Collections.Dictionary<[string, string], Array<[string, [number, number]]>>();
 
@@ -18,7 +18,7 @@ export class DlxPuzzleSolver {
         const valueRange: number[] = range(1, this.puzzle.puzzleSize + 1);
         constraintTypes.forEach(constraint => {
             product2(valueRange, valueRange).forEach(pair => {
-                this.x.setValue([constraint, pair], new Collections.Set<[string, string]>());
+                this.x.setValue([constraint, pair], new Set<[string, string]>());
             });
         });
 
@@ -78,7 +78,7 @@ export class DlxPuzzleSolver {
     }
 
     private *recursiveSolve(
-        x: Collections.Dictionary<[string, [number, number]], Collections.Set<[string, string]>>,
+        x: Collections.Dictionary<[string, [number, number]], Set<[string, string]>>,
         y: Collections.Dictionary<[string, string], Array<[string, [number, number]]>>,
         solution: Array<[string, string]>): Generator<Array<[string, string]>> {
 
@@ -89,22 +89,22 @@ export class DlxPuzzleSolver {
 
             // this finds smallest set size
             const minSetSize = Math.min.apply(x.forEach(p => {
-                x.getValue(p)?.size();
+                return x.getValue(p)?.size;
             }));
 
             let c: [string, [number, number]] | undefined;
             x.keys().forEach(i => {
-                if (x.getValue(i)?.size() === minSetSize) {
+                if (x.getValue(i)?.size === minSetSize) {
                     c = i;
                 }
             });
 
             if (c !== undefined) {
-                const xSets: Array<[string, string]>|undefined = x.getValue(c)?.toArray();
+                const xSets: Array<[string, string]>|undefined = [...x.getValue(c)];
                 if (xSets !== undefined) {
                     // tslint:disable-next-line: prefer-for-of
                     for (let i = 0; i < xSets.length; i++) {
-                        const r  = xSets[i];
+                        const r = xSets[i];
                         solution.push(r);
                         // put the covered columns on the stack
                         const cols = this.cover(x, y, r);
@@ -123,16 +123,16 @@ export class DlxPuzzleSolver {
     }
 
     private cover(
-        x: Collections.Dictionary<[string, [number, number]], Collections.Set<[string, string]>>,
+        x: Collections.Dictionary<[string, [number, number]], Set<[string, string]>>,
         y: Collections.Dictionary<[string, string], Array<[string, [number, number]]>>,
-        r: [string, string]): Array<Collections.Set<[string, string]>> {
+        r: [string, string]): Array<Set<[string, string]>> {
 
-        const cols: Array<Collections.Set<[string, string]>> = [];
+        const cols: Array<Set<[string, string]>> = [];
         y.getValue(r)?.forEach(j => {
             x.getValue(j)?.forEach(i => {
                 y.getValue(i)?.forEach(k => {
-                    if (k !== j) {
-                        x.getValue(k)?.remove(i);
+                    if (JSON.stringify(k) !== JSON.stringify(j)) {
+                        x.getValue(k)?.delete(i);
                     }
 
                     const v = x.getValue(j);
@@ -148,10 +148,10 @@ export class DlxPuzzleSolver {
     }
 
     private uncover(
-        x: Collections.Dictionary<[string, [number, number]], Collections.Set<[string, string]>>,
+        x: Collections.Dictionary<[string, [number, number]], Set<[string, string]>>,
         y: Collections.Dictionary<[string, string], Array<[string, [number, number]]>>,
         r: [string, string],
-        cols: Array<Collections.Set<[string, string]>>) {
+        cols: Array<Set<[string, string]>>) {
 
         y.getValue(r)?.slice().reverse().forEach(j => {
             const v = cols.pop();
@@ -161,7 +161,7 @@ export class DlxPuzzleSolver {
 
             x.getValue(j)?.forEach(i => {
                 y.getValue(i)?.forEach(k => {
-                    if (k !== j) {
+                    if (JSON.stringify(k) !== JSON.stringify(j)) {
                         x.getValue(k)?.add(i);
                     }
                 });

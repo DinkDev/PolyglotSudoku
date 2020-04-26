@@ -37,16 +37,16 @@ describe('DlxPuzzleSolver constructor', () => {
     });
 
     it('solve finds a solution', () => {
-        const boardDef = [
-            '4..27.6..',
-            '798156234',
-            '.2.84...7',
-            '237468951',
-            '849531726',
-            '561792843',
-            '.82.15479',
-            '.7..243..',
-            '..4.87..2',
+        const boardDef = [  // same ad grid2d in python
+            '4.....8.5',
+            '.3.......',
+            '...7.....',
+            '.2.....6.',
+            '....8.4..',
+            '....1....',
+            '...6.3.7.',
+            '5..2.....',
+            '1.4......',
         ];
         const puzzle = new Puzzle(9);
         puzzle.loadPuzzle(boardDef);

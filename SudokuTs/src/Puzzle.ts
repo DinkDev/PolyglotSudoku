@@ -41,8 +41,8 @@ export class Puzzle {
     }
 
     public createGrid() {
-        for (let rIndex: number = 0; rIndex < this.puzzleSize; rIndex++) {
-            for (let cIndex: number = 0; cIndex < this.puzzleSize; cIndex++) {
+        for (let rIndex: number = 1; rIndex <= this.puzzleSize; rIndex++) {
+            for (let cIndex: number = 1; cIndex <= this.puzzleSize; cIndex++) {
                 this.grid.setValue(`r${rIndex}c${cIndex}`, null);
             }
         }
@@ -108,10 +108,11 @@ export class Puzzle {
             const cellString: string = rowString.slice(c, c + 1);
             const isCellValue = regexp.test(cellString);
 
+            const gridIndex = `r${r + 1}c${c + 1}`;
             if (! isCellValue) {
-                this.grid.setValue(`r${r}c${c}`, null);
+                this.grid.setValue(gridIndex, null);
             } else {
-                this.grid.setValue(`r${r}c${c}`, cellString);
+                this.grid.setValue(gridIndex, cellString);
             }
         }
     }
@@ -122,8 +123,8 @@ export class Puzzle {
     public toString(): string {
         let rv: string = '';
 
-        for (let rIndex: number = 0; rIndex < this.puzzleSize; rIndex++) {
-            for (let cIndex: number = 0; cIndex < this.puzzleSize; cIndex++) {
+        for (let rIndex: number = 1; rIndex <= this.puzzleSize; rIndex++) {
+            for (let cIndex: number = 1; cIndex <= this.puzzleSize; cIndex++) {
                 rv += this.convertToChar(this.grid.getValue(`r${rIndex}c${cIndex}`));
             }
         }
@@ -180,11 +181,11 @@ export class Puzzle {
      * @returns true is valid, false otherwise.
      */
     public isValidCellCount(boardCellCount: number): boolean {
-        const validCellCounts = new Collections.Set<number>();
+        const validCellCounts = new Set<number>();
         [PuzzleSize.FourByFour, PuzzleSize.NineByNine, PuzzleSize.SixteenBySixteen].forEach(element => {
             validCellCounts.add(element * element);
         });
 
-        return validCellCounts.contains(boardCellCount);
+        return validCellCounts.has(boardCellCount);
     }
 }
