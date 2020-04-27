@@ -87,15 +87,30 @@ export class DlxPuzzleSolver {
         } else {
             // find smallest set in x
 
+            let minSetSize = this.puzzle?.puzzleSize ?? 9;
             // this finds smallest set size
-            const minSetSize = Math.min.apply(x.forEach(p => {
-                return x.getValue(p)?.size;
-            }));
+            // for (const p in x.keys()) {
+            //     if (x.getValue(p) !== undefined) {
+            //         const thisSize = x.getValue(p)?.size ?? 0;
+            //         if (thisSize < minSetSize) {
+            //             minSetSize = thisSize;
+            //         }
+            //     }
+            // }
+
+            x.keys().forEach( p => {
+                const nextSize = x.getValue(p)?.size ?? 9;
+                if (nextSize < minSetSize) {
+                    minSetSize = nextSize;
+                }
+            });
 
             let c: [string, [number, number]] | undefined;
-            x.keys().forEach(i => {
+
+            x.keys().some(i => {
                 if (x.getValue(i)?.size === minSetSize) {
                     c = i;
+                    return true;
                 }
             });
 

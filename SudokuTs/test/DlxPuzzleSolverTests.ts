@@ -9,15 +9,15 @@ describe('DlxPuzzleSolver constructor', () => {
 
     it('args instanceOf Puzzle initializes state', () => {
         const boardDef = [
-            '4..27.6..',
-            '798156234',
-            '.2.84...7',
-            '237468951',
-            '849531726',
-            '561792843',
-            '.82.15479',
-            '.7..243..',
-            '..4.87..2',
+            '4.....8.5',
+            '.3.......',
+            '...7.....',
+            '.2.....6.',
+            '....8.4..',
+            '....1....',
+            '...6.3.7.',
+            '5..2.....',
+            '1.4......',
         ];
         const puzzle = new Puzzle(9);
         puzzle.loadPuzzle(boardDef);
@@ -25,15 +25,8 @@ describe('DlxPuzzleSolver constructor', () => {
         const sut = new DlxPuzzleSolver(puzzle);
 
         expect(sut.puzzle).to.equal(puzzle);
-        // tslint:disable-next-line: no-string-literal
-        expect(sut['x'].size()).to.equal(141);
-        // tslint:disable-next-line: no-string-literal
+        expect(sut['x'].size()).to.equal(256);
         expect(sut['y'].size()).to.equal(729);
-        // expect(sut.puzzleSize).to.equal(PuzzleSize.NineByNine);
-        // expect(sut.grid.getValue('r0c0')).to.equal('4');
-        // expect(sut.grid.getValue('r0c1')).to.equal(null);
-        // expect(sut.grid.getValue('r4c4')).to.equal('3');
-        // expect(sut.grid.getValue('r8c8')).to.equal('2');
     });
 
     it('solve finds a solution', () => {
@@ -55,11 +48,12 @@ describe('DlxPuzzleSolver constructor', () => {
 
         const result = sut.solve();
 
-        expect(sut.puzzle).to.equal(puzzle);
+        expect(result.length).to.equal(1)
+        // expect(sut.puzzle).to.equal(puzzle);
         // tslint:disable-next-line: no-string-literal
-        expect(sut['x'].size()).to.equal(141);
+        // expect(sut['x'].size()).to.equal(141);
         // tslint:disable-next-line: no-string-literal
-        expect(sut['y'].size()).to.equal(729);
+        // expect(sut['y'].size()).to.equal(729);
         // expect(sut.puzzleSize).to.equal(PuzzleSize.NineByNine);
         // expect(sut.grid.getValue('r0c0')).to.equal('4');
         // expect(sut.grid.getValue('r0c1')).to.equal(null);
