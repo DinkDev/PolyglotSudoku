@@ -16,7 +16,7 @@ namespace SudokuSharp.Engine
     /// </summary>
     public sealed class Puzzle : INotifyPropertyChanged
     {
-        private byte?[,] _grid; // only access through the wrapper property this[]!
+        private PuzzleCoordinateAndValue[,] _grid; // only access through the wrapper property this[]!
         private PuzzleSize _puzzleSize = PuzzleSize.Undefined;
 
         /// <summary>
@@ -85,13 +85,13 @@ namespace SudokuSharp.Engine
         /// <returns>The cell value at that coordinate if set, null otherwise</returns>
         internal byte? this[int row, int column]
         {
-            get => _grid[row, column];
+            get => _grid[row, column].Value;
             set
             {
-                var currentValue = _grid[row, column];
+                var currentValue = _grid[row, column].Value;
                 if (!value.Equals(currentValue))
                 {
-                    _grid[row, column] = value;
+                    _grid[row, column].Value = value;
                     NotifyOfPropertyChanged();
                 }
             }
@@ -271,7 +271,15 @@ namespace SudokuSharp.Engine
         private void CreateGrid(PuzzleSize puzzleSize)
         {
             var gridDim = puzzleSize != PuzzleSize.Undefined ? puzzleSize.ToInt32() : 0;
-            _grid = new byte?[gridDim, gridDim];
+            _grid = new PuzzleCoordinateAndValue[gridDim, gridDim];
+
+            foreach (var row in Enumerable.Range(0, gridDim))
+            {
+                foreach (var col in Enumerable.Range(0, gridDim))
+                {
+                    _grid[row, col] = new PuzzleCoordinateAndValue(new PuzzleCoordinate(row, col), null);
+                }
+            }
 
             Size = puzzleSize;
 

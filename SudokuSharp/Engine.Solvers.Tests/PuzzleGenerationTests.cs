@@ -1,5 +1,7 @@
 namespace SudokuSharp.Engine.Solvers.Tests
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -16,6 +18,13 @@ namespace SudokuSharp.Engine.Solvers.Tests
         public void LetsTryToGenerateAPuzzle_Test1()
         {
             var puzzleGrid = new Puzzle(PuzzleSize.NineByNine);
+
+            var sut = new Puzzle(PuzzleSize.NineByNine);
+
+            var puzzleBoxes = puzzleGrid.ByBox()
+                .Select(box => box.ToList()).ToList();
+
+
 
 
             //puzzleGrid.LoadPuzzle(new string('.', 81));
