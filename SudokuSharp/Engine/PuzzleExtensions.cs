@@ -12,7 +12,7 @@
         /// </summary>
         /// <param name="puzzle"></param>
         /// <returns></returns>
-        public static IEnumerable<IEnumerable<KeyValuePair<PuzzleCoordinate, byte?>>> ByBox(
+        public static IEnumerable<IEnumerable<PuzzleCoordinateAndValue>> ByBox(
             this Puzzle puzzle)
         {
             for (var box = 0; box < puzzle.Size.ToInt32(); box++)
@@ -21,7 +21,7 @@
             }
         }
 
-        private static IEnumerable<KeyValuePair<PuzzleCoordinate, byte?>> CellsByBox(
+        private static IEnumerable<PuzzleCoordinateAndValue> CellsByBox(
             Puzzle puzzle, int box)
         {
             var boxSize = puzzle.Size.BoxSize();
@@ -35,18 +35,17 @@
                     var coordinate = new PuzzleCoordinate(row, col);
                     var value = puzzle[coordinate];
 
-                    yield return new KeyValuePair<PuzzleCoordinate, byte?>(coordinate, value);
+                    yield return new PuzzleCoordinateAndValue(coordinate, value);
                 }
             }
         }
-
 
         /// <summary>
         /// Gets a nested IEnumerable to traverse a Puzzle by columns.
         /// </summary>
         /// <param name="puzzle"></param>
         /// <returns></returns>
-        public static IEnumerable<IEnumerable<KeyValuePair<PuzzleCoordinate, byte?>>> ByCol(
+        public static IEnumerable<IEnumerable<PuzzleCoordinateAndValue>> ByCol(
             this Puzzle puzzle)
         {
             for (var col = 0; col < puzzle.Size.ToInt32(); col++)
@@ -55,7 +54,7 @@
             }
         }
 
-        private static IEnumerable<KeyValuePair<PuzzleCoordinate, byte?>> RowsByColumn(
+        private static IEnumerable<PuzzleCoordinateAndValue> RowsByColumn(
             Puzzle puzzle, int col)
         {
             for (var row = 0; row < puzzle.Size.ToInt32(); row++)
@@ -63,7 +62,7 @@
                 var coordinate = new PuzzleCoordinate(row, col);
                 var value = puzzle[coordinate];
 
-                yield return new KeyValuePair<PuzzleCoordinate, byte?>(coordinate, value);
+                yield return new PuzzleCoordinateAndValue(coordinate, value);
             }
         }
 
@@ -72,7 +71,7 @@
         /// </summary>
         /// <param name="puzzle"></param>
         /// <returns></returns>
-        public static IEnumerable<IEnumerable<KeyValuePair<PuzzleCoordinate, byte?>>> ByRow(
+        public static IEnumerable<IEnumerable<PuzzleCoordinateAndValue>> ByRow(
             this Puzzle puzzle)
         {
             for (var row = 0; row < puzzle.Size.ToInt32(); row++)
@@ -81,7 +80,7 @@
             }
         }
 
-        private static IEnumerable<KeyValuePair<PuzzleCoordinate, byte?>> ColumnsByRow(
+        private static IEnumerable<PuzzleCoordinateAndValue> ColumnsByRow(
             Puzzle puzzle, int row)
         {
             for (var col = 0; col < puzzle.Size.ToInt32(); col++)
@@ -89,7 +88,7 @@
                 var coordinate = new PuzzleCoordinate(row, col);
                 var value = puzzle[coordinate];
 
-                yield return new KeyValuePair<PuzzleCoordinate, byte?>(coordinate, value);
+                yield return new PuzzleCoordinateAndValue(coordinate, value);
             }
         }
 
@@ -215,6 +214,5 @@
             // If we made it this far, this state is a valid solution!  Woo hoo!
             return PuzzleStatus.Solved;
         }
-
     }
 }

@@ -32,8 +32,6 @@ namespace SudokuSharp.Engine.Tests
         }
 
         [Fact]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Potential Code Quality Issues",
-            "RECS0026:Possible unassigned object created by 'new'", Justification = "<Pending>")]
         public void Puzzle_CtorTest_UndefinedDoesNotThrow()
         {
             // ReSharper disable once ObjectCreationAsStatement
@@ -127,8 +125,8 @@ namespace SudokuSharp.Engine.Tests
                 var colNum = 0;
                 foreach (var cell in row)
                 {
-                    Assert.Equal(rowNum, cell.Key.Row);
-                    Assert.Equal(colNum, cell.Key.Col);
+                    Assert.Equal(rowNum, cell.Coordinate.Row);
+                    Assert.Equal(colNum, cell.Coordinate.Col);
                     colNum++;
                 }
 
@@ -147,8 +145,8 @@ namespace SudokuSharp.Engine.Tests
                 var rowNum = 0;
                 foreach (var cell in col)
                 {
-                    Assert.Equal(rowNum, cell.Key.Row);
-                    Assert.Equal(colNum, cell.Key.Col);
+                    Assert.Equal(rowNum, cell.Coordinate.Row);
+                    Assert.Equal(colNum, cell.Coordinate.Col);
                     rowNum++;
                 }
 
@@ -170,10 +168,10 @@ namespace SudokuSharp.Engine.Tests
                     var rowNum = (boxNum / 3) * 3 + rowCellNum / 3;
                     var colNum = (boxNum % 3) * 3 + rowCellNum % 3;
 
-                    TestContext.WriteLine($"{cell.Key.Row}, {cell.Key.Col}");
+                    TestContext.WriteLine($"{cell.Coordinate.Row}, {cell.Coordinate.Col}");
 
-                    Assert.Equal(rowNum, cell.Key.Row);
-                    Assert.Equal(colNum, cell.Key.Col);
+                    Assert.Equal(rowNum, cell.Coordinate.Row);
+                    Assert.Equal(colNum, cell.Coordinate.Col);
                     rowCellNum++;
                 }
 
