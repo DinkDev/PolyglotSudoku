@@ -7,7 +7,6 @@ export class Puzzle {
     public puzzleSize: PuzzleSize = PuzzleSize.Undefined;
     public grid: Collections.Dictionary<string, cellType>
         = new Collections.Dictionary<string, cellType>();
-
     public readonly NullChar = '.';
 
     /**

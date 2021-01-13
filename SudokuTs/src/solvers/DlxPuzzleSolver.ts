@@ -7,9 +7,9 @@ export class DlxPuzzleSolver {
     public puzzle: Puzzle;
 
     private x: Collections.Dictionary<[string, [number, number]], Set<[string, string]>>
-        = new Collections.Dictionary<[string, [number, number]], Set<[string, string]>>();
+        = new Collections.Dictionary<[string, [number, number]], Set<[string, string]>>(this.objToString);
     private y: Collections.Dictionary<[string, string], Array<[string, [number, number]]>>
-        = new Collections.Dictionary<[string, string], Array<[string, [number, number]]>>();
+        = new Collections.Dictionary<[string, string], Array<[string, [number, number]]>>(this.objToString);
 
     constructor(puzzle: Puzzle) {
         this.puzzle = puzzle;
@@ -184,5 +184,9 @@ export class DlxPuzzleSolver {
         });
 
         return cols;
+    }
+
+    private objToString(data: any) {
+        return JSON.stringify(data);
     }
 }
