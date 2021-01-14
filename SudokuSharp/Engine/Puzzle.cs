@@ -6,15 +6,13 @@ namespace SudokuSharp.Engine
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
     using System.Text;
-    using Annotations;
 
     /// <summary>
     /// A simple implementation of a Sudoku puzzle!
     /// </summary>
-    public sealed class Puzzle : INotifyPropertyChanged
+    public sealed class Puzzle : NotifyPropertyChangedBase
     {
         private PuzzleCoordinateAndValue[,] _grid; // only access through the wrapper property this[]!
         private PuzzleSize _puzzleSize = PuzzleSize.Undefined;
@@ -73,8 +71,16 @@ namespace SudokuSharp.Engine
         /// <returns>The cell value at that coordinate if set, null otherwise</returns>
         public byte? this[PuzzleCoordinate puzzleCoordinate]
         {
-            get => this[puzzleCoordinate.Row, puzzleCoordinate.Col];
-            set => this[puzzleCoordinate.Row, puzzleCoordinate.Col] = value;
+            get => this[puzzleCoordinate.Row, puzzleCoordinate.Col].Value;
+            set
+            {
+                var currentValue = this[puzzleCoordinate.Row, puzzleCoordinate.Col].Value;
+                if (!value.Equals(currentValue))
+                {
+                    this[puzzleCoordinate.Row, puzzleCoordinate.Col].Value = value;
+                    NotifyOfPropertyChanged();
+                }
+            }
         }
 
         /// <summary>
@@ -83,19 +89,7 @@ namespace SudokuSharp.Engine
         /// <param name="row">The row coordinate to access</param>
         /// <param name="column">The column coordinate to access</param>
         /// <returns>The cell value at that coordinate if set, null otherwise</returns>
-        internal byte? this[int row, int column]
-        {
-            get => _grid[row, column].Value;
-            set
-            {
-                var currentValue = _grid[row, column].Value;
-                if (!value.Equals(currentValue))
-                {
-                    _grid[row, column].Value = value;
-                    NotifyOfPropertyChanged();
-                }
-            }
-        }
+        internal PuzzleCoordinateAndValue this[int row, int column] => _grid[row, column];
 
         /// <summary>
         ///     Clone a deep copy of this puzzle.
@@ -263,7 +257,6 @@ namespace SudokuSharp.Engine
             return nullChar.ToString();
         }
 
-
         /// <summary>
         /// Creates a new grid based upon puzzleSize's int equivalent.
         /// </summary>
@@ -286,21 +279,5 @@ namespace SudokuSharp.Engine
             // ReSharper disable once UseNameofExpression
             NotifyOfPropertyChanged(@"Item");
         }
-
-        #region INotifyPropertyChanged implementation
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
-        /// Invokes PropertyChanged event.
-        /// </summary>
-        /// <param name="propertyName">The name of the property changed.</param>
-        [NotifyPropertyChangedInvocator]
-        private void NotifyOfPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        #endregion
     }
 }

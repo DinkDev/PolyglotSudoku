@@ -32,10 +32,7 @@
             {
                 for (var col = boxStartCol; col < boxStartCol + boxSize; col++)
                 {
-                    var coordinate = new PuzzleCoordinate(row, col);
-                    var value = puzzle[coordinate];
-
-                    yield return new PuzzleCoordinateAndValue(coordinate, value);
+                    yield return puzzle[row, col];
                 }
             }
         }
@@ -59,10 +56,7 @@
         {
             for (var row = 0; row < puzzle.Size.ToInt32(); row++)
             {
-                var coordinate = new PuzzleCoordinate(row, col);
-                var value = puzzle[coordinate];
-
-                yield return new PuzzleCoordinateAndValue(coordinate, value);
+                yield return puzzle[row, col];
             }
         }
 
@@ -85,10 +79,7 @@
         {
             for (var col = 0; col < puzzle.Size.ToInt32(); col++)
             {
-                var coordinate = new PuzzleCoordinate(row, col);
-                var value = puzzle[coordinate];
-
-                yield return new PuzzleCoordinateAndValue(coordinate, value);
+                yield return puzzle[row, col];
             }
         }
 

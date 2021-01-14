@@ -5,8 +5,10 @@
     /// <summary>
     /// Provides ref semantics for all of the puzzle.ByX() methods.
     /// </summary>
-    public class PuzzleCoordinateAndValue
+    public class PuzzleCoordinateAndValue : NotifyPropertyChangedBase
     {
+        private byte? _value;
+
         [UsedImplicitly]
         public PuzzleCoordinateAndValue()
         {
@@ -20,6 +22,18 @@
         }
 
         public PuzzleCoordinate Coordinate { get; set; }
-        public byte? Value { get; set; }
+
+        public byte? Value
+        {
+            get => _value;
+            set
+            {
+                if (!value.Equals(_value))
+                {
+                    _value = value;
+                    NotifyOfPropertyChanged();
+                }
+            }
+        }
     }
 }
