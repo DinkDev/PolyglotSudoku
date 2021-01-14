@@ -16,13 +16,33 @@ namespace SudokuSharp.Engine.Solvers.Tests
         }
 
         [Fact]
-        public void LetsTryToGenerateAPuzzle_Test1()
+        public void PuzzleSolutionGenerator_CreatePuzzleSolution_Test1()
         {
             var sut = new PuzzleSolutionGenerator(PuzzleSize.NineByNine);
 
             var result = sut.CreatePuzzleSolution();
 
             Assert.NotNull(result);
+        }
+
+        [Fact]
+        public void PuzzleSolutionGenerator_RecursiveFillPuzzleBox_Test1()
+        {
+            var sut = new PuzzleSolutionGenerator(PuzzleSize.NineByNine);
+            sut.SeedPuzzleBox();
+
+            var result = sut.RecursiveFillPuzzleBox(1, 0);
+
+            Assert.True(result);
+
+            var values = sut.PuzzleBoxes[1]
+                .Select(p => p.Value)
+                .Where(v => v.HasValue)
+                .Select(v => v.Value)
+                .Distinct()
+                .OrderBy(v => v).ToList();
+
+            Assert.Equal(PuzzleSize.NineByNine.ToInt32(), values.Count);
         }
 
         [Fact]
@@ -54,12 +74,7 @@ namespace SudokuSharp.Engine.Solvers.Tests
 
         public Puzzle CreatePuzzleSolution()
         {
-            // seed first box - guaranteed to be ok
-            var choices = RandomChoices();
-            foreach (var boxCell in Enumerable.Range(0, PuzzleGrid.Size.ToInt32()))
-            {
-                PuzzleBoxes[0][boxCell].Value = choices[boxCell];
-            }
+            SeedPuzzleBox();
 
             // More to do
 
@@ -67,33 +82,78 @@ namespace SudokuSharp.Engine.Solvers.Tests
             return PuzzleGrid;
         }
 
-        public bool RecursiveFillPuzzle(int boxIndex, int cellIndex, List<byte> choices)
+        /// <summary>
+        /// Seed a box - this is guaranteed to be OK.
+        /// </summary>
+        /// <param name="box"></param>
+        public void SeedPuzzleBox(int box = 0)
         {
-            var choicesToUse = choices.ToList();
-
-            if (cellIndex == 0 || choicesToUse.Count == 0)
+            var choices = RandomChoices();
+            foreach (var boxCell in Enumerable.Range(box, PuzzleGrid.Size.ToInt32()))
             {
-                choicesToUse = RandomChoices().ToList();
+                PuzzleBoxes[box][boxCell].Value = choices[boxCell];
             }
+        }
 
-            if (cellIndex < PuzzleGrid.Size.ToInt32())
-            {
+        public bool RecursiveFillPuzzleBox(int boxIndex, int boxCellIndex)
+        {
+            var rv = true;
 
-            }
-            else
+            if (boxCellIndex < PuzzleGrid.Size.ToInt32())
             {
-                boxIndex = boxIndex + 1;
-                cellIndex = 0;
-                if (boxIndex < PuzzleGrid.Size.ToInt32())
+                var boxCell = PuzzleBoxes[boxIndex][boxCellIndex];
+                var usedChoices = UsedChoices(boxIndex, boxCell.Coordinate.Row, boxCell.Coordinate.Col);
+                var choicesToUse = RandomChoices()
+                    .Where(r => !usedChoices.Contains(r))
+                    .ToList();
+
+                rv = choicesToUse.Any();
+                if (rv)
                 {
+                    foreach (var choice in choicesToUse)
+                    {
+                        boxCell.Value = choice;
+                        rv = RecursiveFillPuzzleBox(boxIndex, boxCellIndex + 1);
+                        if (rv)
+                        {
+                            break;
+                        }
+                    }
 
+                    // clear current on failure
+                    if (!rv)
+                    {
+                        boxCell.Value = null;
+                    }
                 }
             }
 
+            return rv;
+        }
 
-            return true;
+        public List<byte> UsedChoices(int box, int row, int col)
+        {
+            // start with box values
+            var rv = (
+                from cell in PuzzleBoxes[box]
+                where cell.Value.HasValue
+                select cell.Value.Value).ToList();
 
+            var rowValues = (
+                from colIndex in Enumerable.Range(0, PuzzleGrid.Size.ToInt32())
+                select PuzzleGrid[new PuzzleCoordinate(row, colIndex)] into value
+                where value.HasValue
+                select value.Value).ToList();
+            rv.AddRange(rowValues);
 
+            var colValues = (
+                from rowIndex in Enumerable.Range(0, PuzzleGrid.Size.ToInt32())
+                select PuzzleGrid[new PuzzleCoordinate(rowIndex, col)] into value
+                where value.HasValue
+                select value.Value).ToList();
+            rv.AddRange(colValues);
+
+            return rv.OrderBy(v => v).Distinct().ToList();
         }
 
         public List<byte> RandomChoices()

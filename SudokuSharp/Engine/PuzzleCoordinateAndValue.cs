@@ -1,10 +1,12 @@
 ﻿namespace SudokuSharp.Engine
 {
+    using System.Diagnostics;
     using Annotations;
 
     /// <summary>
     /// Provides ref semantics for all of the puzzle.ByX() methods.
     /// </summary>
+    [DebuggerDisplay("R{Coordinate.Row}, C{Coordinate.Col}, Value: {Value}")]
     public class PuzzleCoordinateAndValue : NotifyPropertyChangedBase
     {
         private byte? _value;
