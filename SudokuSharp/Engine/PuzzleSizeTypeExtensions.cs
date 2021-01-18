@@ -27,6 +27,39 @@
         }
 
         /// <summary>
+        /// Get's the center coordinate of a puzzle, if PuzzleSize.IsOdd() is true!
+        /// </summary>
+        /// <param name="puzzleSize">The PuzzleSize of the puzzle.</param>
+        /// <returns>The center coordinate of the puzzle, if it has one.</returns>
+        public static PuzzleCoordinate GetCenterCoordinate(this PuzzleSize puzzleSize)
+        {
+            if (puzzleSize != PuzzleSize.NineByNine)
+            {
+                throw new ArgumentOutOfRangeException(nameof(puzzleSize), "Must be PuzzleSize.NineByNine");
+            }
+
+            var center = new PuzzleCoordinate(4, 4);
+
+            return center;
+        }
+
+        /// <summary>
+        /// Is the puzzle and odd number of rows, columns or boxes?
+        /// </summary>
+        /// <param name="puzzleSize">The PuzzleSize being checked.</param>
+        /// <returns>true if odd, false if not</returns>
+        public static bool IsOdd(this PuzzleSize puzzleSize)
+        {
+            if (puzzleSize == PuzzleSize.Undefined)
+            {
+                throw new ArgumentOutOfRangeException(nameof(puzzleSize),
+                    "PuzzleSize.Undefined is neither even or odd");
+            }
+
+            return (puzzleSize == PuzzleSize.NineByNine);
+        }
+
+        /// <summary>
         /// Gets the integer value for the number of rows, columns or boxes defined by PuzzleSize.
         /// </summary>
         /// <param name="puzzleSize">The PuzzleSize getting the in value for.</param>

@@ -9,7 +9,7 @@
     /// DLX support - inspired by Miran Uhan's Dancing Links Library in CodeProject.
     /// <see cref="http://www.codeproject.com/Articles/19630/Dancing-Links-Library"/>
     /// </summary>
-    public class DlxPuzzleSolver
+    public class DlxPuzzleSolver : IPuzzleSolver
     {
         private PuzzleSize _puzzleSize;
         private readonly Dictionary<int, DlxHeader> _columnHeaders = new Dictionary<int, DlxHeader>();

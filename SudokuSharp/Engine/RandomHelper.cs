@@ -13,7 +13,7 @@
         /// <summary>Gets a random non-negative integer strictly less than the specified maximum.</summary>
         /// <param name="max">The maximum integer that is strictly greater than the maximum value to be returned.</param>
         /// <returns>The random value.</returns>
-        public int GetRandomNumber(int max)
+        public int GetRandomNumber(int max = int.MaxValue)
         {
             if (max <= 0)
             {

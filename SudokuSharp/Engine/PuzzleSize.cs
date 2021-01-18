@@ -1,5 +1,7 @@
 ﻿namespace SudokuSharp.Engine
 {
+    using System;
+
     /// <summary>
     /// The PuzzleSize in enum form.
     /// </summary>
