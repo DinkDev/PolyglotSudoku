@@ -9,7 +9,7 @@
     /// Struct for sudoku puzzle coordinates (zero based).
     /// </summary>
     [DebuggerDisplay("R{Row}, C{Col}")]
-    public struct PuzzleCoordinate : IComparable<PuzzleCoordinate>
+    public readonly struct PuzzleCoordinate : IComparable<PuzzleCoordinate>, IEquatable<PuzzleCoordinate>
     {
         public int Col { get; }
         public int Row { get; }
@@ -17,19 +17,15 @@
         /// <summary>
         /// Ctor.
         /// </summary>
-        /// <param name="row"></param>
-        /// <param name="col"></param>
+        /// <param name="row">The row value, 0 based</param>
+        /// <param name="col">The column value, 0 based</param>
         public PuzzleCoordinate(int row, int col)
         {
             Row = row;
             Col = col;
         }
 
-        /// <summary>
-        /// IComparable - for sorting!
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public int CompareTo(PuzzleCoordinate other)
         {
             var rv = Row - other.Row;
@@ -39,6 +35,27 @@
             }
 
             return rv;
+        }
+
+        /// <inheritdoc/>
+        public bool Equals(PuzzleCoordinate other)
+        {
+            return Col == other.Col && Row == other.Row;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PuzzleCoordinate other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Col, Row);
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(Row)}: {Row}, {nameof(Col)}: {Col}";
         }
     }
 }

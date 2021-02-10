@@ -61,7 +61,7 @@
         public void SeedPuzzleBox(int box = 0)
         {
             var choices = RandomChoices();
-            foreach (var boxCell in Enumerable.Range(box, PuzzleGrid.Size.ToInt32()))
+            foreach (var boxCell in Enumerable.Range(0, PuzzleGrid.Size.ToInt32()))
             {
                 PuzzleBoxes[box][boxCell].Value = choices[boxCell];
             }
