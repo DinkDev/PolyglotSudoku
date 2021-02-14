@@ -46,7 +46,7 @@ namespace SudokuSharp.Engine.Solvers.Tests
         [Fact]
         public void FasterPuzzleSolutionGenerator_SeedFirstBox_Test1()
         {
-            var sut = new FasterPuzzleSolutionGenerator(PuzzleSize.NineByNine);
+            var sut = new OptimizedPuzzleSolutionGenerator(PuzzleSize.NineByNine);
             sut.Random = new TestNotSoRandom();
             
             sut.SeedFirstBox();
@@ -61,7 +61,7 @@ namespace SudokuSharp.Engine.Solvers.Tests
         {
             for (var count = 0; count < 1000; count++)
             {
-                var sut = new FasterPuzzleSolutionGenerator(PuzzleSize.NineByNine);
+                var sut = new OptimizedPuzzleSolutionGenerator(PuzzleSize.NineByNine);
 
                 sut.SeedFirstBox();
 
@@ -76,7 +76,7 @@ namespace SudokuSharp.Engine.Solvers.Tests
         [Fact]
         public void FasterPuzzleSolutionGenerator_SeedSecondBox_Test1()
         {
-            var sut = new FasterPuzzleSolutionGenerator(PuzzleSize.NineByNine);
+            var sut = new OptimizedPuzzleSolutionGenerator(PuzzleSize.NineByNine);
             sut.Random = new TestNotSoRandom();
             sut.SeedFirstBox();
 
@@ -92,7 +92,7 @@ namespace SudokuSharp.Engine.Solvers.Tests
         {
             for (var count = 0; count < 1000; count++)
             {
-                var sut = new FasterPuzzleSolutionGenerator(PuzzleSize.NineByNine);
+                var sut = new OptimizedPuzzleSolutionGenerator(PuzzleSize.NineByNine);
                 sut.SeedFirstBox();
 
                 sut.SeedSecondBox();
@@ -107,9 +107,55 @@ namespace SudokuSharp.Engine.Solvers.Tests
         }
 
         [Fact]
+        public void FasterPuzzleSolutionGenerator_SeedSecondBox_SetBased_Test1()
+        {
+            HashSet<int>[] CreateBoxRowSet(Puzzle puzzleGrid)
+            {
+                return Enumerable.Range(0, puzzleGrid.Size.BoxSize())
+                    .Select(i => new HashSet<int>())
+                    .ToArray();
+            }
+
+            var sut = new OptimizedPuzzleSolutionGenerator(PuzzleSize.NineByNine);
+            sut.Random = new TestNotSoRandom();
+            sut.SeedFirstBox();
+
+            // to make code look like class method
+            var PuzzleGrid = new Puzzle(PuzzleSize.NineByNine);
+            var puzzleValues = new List<int>(Enumerable.Range(1, PuzzleGrid.Size.ToInt32()));
+
+            // get box0 values by row
+            var box0 = CreateBoxRowSet(PuzzleGrid);
+            foreach (var row in Enumerable.Range(0, PuzzleGrid.Size.BoxSize()))
+            {
+                foreach (var col in Enumerable.Range(0, PuzzleGrid.Size.BoxSize()))
+                {
+                    box0[row].Add(sut.PuzzleGrid[new PuzzleCoordinate(row, col)] ?? -1);
+                }
+            }
+
+            var box1 = CreateBoxRowSet(PuzzleGrid);
+            var box1Row0Choices = Enumerable.Range(1, PuzzleGrid.Size.BoxSize() - 1)
+                .SelectMany(i => box0[i])
+                .OrderBy(x => sut.Random.GetRandomNumber())
+                .Take(PuzzleGrid.Size.BoxSize());
+
+            foreach (var value in box1Row0Choices)
+            {
+                box1[0].Add(value);
+            }
+
+
+
+            var solution = sut.PuzzleGrid;
+
+            Approvals.Verify(solution);
+        }
+
+        [Fact]
         public void FasterPuzzleSolutionGenerator_SeedThirdBox_Test1()
         {
-            var sut = new FasterPuzzleSolutionGenerator(PuzzleSize.NineByNine);
+            var sut = new OptimizedPuzzleSolutionGenerator(PuzzleSize.NineByNine);
             sut.Random = new TestNotSoRandom();
             sut.SeedFirstBox();
             sut.SeedSecondBox();
@@ -126,7 +172,7 @@ namespace SudokuSharp.Engine.Solvers.Tests
         {
             for (var count = 0; count < 1000; count++)
             {
-                var sut = new FasterPuzzleSolutionGenerator(PuzzleSize.NineByNine);
+                var sut = new OptimizedPuzzleSolutionGenerator(PuzzleSize.NineByNine);
                 sut.SeedFirstBox();
                 sut.SeedSecondBox();
 
@@ -145,7 +191,7 @@ namespace SudokuSharp.Engine.Solvers.Tests
         [Fact]
         public void FasterPuzzleSolutionGenerator_SeedFirstColumn_Test1()
         {
-            var sut = new FasterPuzzleSolutionGenerator(PuzzleSize.NineByNine);
+            var sut = new OptimizedPuzzleSolutionGenerator(PuzzleSize.NineByNine);
             sut.Random = new TestNotSoRandom();
             sut.SeedFirstBox();
             sut.SeedSecondBox();
@@ -163,7 +209,7 @@ namespace SudokuSharp.Engine.Solvers.Tests
         {
             for (var count = 0; count < 1000; count++)
             {
-                var sut = new FasterPuzzleSolutionGenerator(PuzzleSize.NineByNine);
+                var sut = new OptimizedPuzzleSolutionGenerator(PuzzleSize.NineByNine);
 
                 sut.SeedFirstBox();
                 sut.SeedSecondBox();
@@ -186,7 +232,7 @@ namespace SudokuSharp.Engine.Solvers.Tests
         [Fact]
         public void FasterPuzzleSolutionGenerator_CreatePuzzleSolution_Test1()
         {
-            var sut = new FasterPuzzleSolutionGenerator(PuzzleSize.NineByNine);
+            var sut = new OptimizedPuzzleSolutionGenerator(PuzzleSize.NineByNine);
 
             var result = sut.CreatePuzzleSolution();
 
@@ -215,7 +261,7 @@ namespace SudokuSharp.Engine.Solvers.Tests
             t.Start();
             for (var count = 0; count < 100; count++)
             {
-                var sut = new FasterPuzzleSolutionGenerator(PuzzleSize.NineByNine);
+                var sut = new OptimizedPuzzleSolutionGenerator(PuzzleSize.NineByNine);
 
                 var result = sut.CreatePuzzleSolution();
 

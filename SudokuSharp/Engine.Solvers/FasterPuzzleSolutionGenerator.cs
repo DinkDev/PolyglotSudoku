@@ -8,15 +8,22 @@
     /// <summary>
     /// A class that will randomly fill a puzzle grid with a correct solution.
     ///
+    /// It is optimized for quickly filling much of the grid, then recursively
+    /// filling the rest.
+    ///
     /// This is a precursor to a puzzle generator.
     /// </summary>
-    public class FasterPuzzleSolutionGenerator
+    /// <remarks>
+    /// This was inspired by a paper by Daniel Beer.  His paper is posted at:
+    /// https://dlbeer.co.nz/articles/sudoku.html
+    /// </remarks>
+    public class OptimizedPuzzleSolutionGenerator
     {
         /// <summary>
         /// Ctor
         /// </summary>
         /// <param name="puzzleSize">The size of the puzzle solution to generate</param>
-        public FasterPuzzleSolutionGenerator(PuzzleSize puzzleSize)
+        public OptimizedPuzzleSolutionGenerator(PuzzleSize puzzleSize)
         {
             PuzzleGrid = new Puzzle(puzzleSize);
 
@@ -62,7 +69,9 @@
         }
 
         /// <summary>
-        /// Seed a box - this is guaranteed to be OK.
+        /// Seed the first box - just pick each number from the set.
+        /// 
+        /// This is guaranteed to be OK (and quick).
         /// </summary>
         public void SeedFirstBox()
         {
@@ -73,6 +82,15 @@
             }
         }
 
+        /// <summary>
+        /// Seed the second box.
+        ///
+        /// This is more difficult, but still quick.
+        /// 
+        /// B2's 1st row can be any from B1's 2nd or 3rd
+        /// B2's 2nd row must include any remaining from B2's 3rd row, fill in with B1's 1st row
+        /// B2's 3rd row is all remaining
+        /// </summary>
         public void SeedSecondBox()
         {
             var boxSize = PuzzleGrid.Size.BoxSize();

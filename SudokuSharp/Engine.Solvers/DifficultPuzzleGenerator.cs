@@ -433,7 +433,7 @@
             // TODO: move up to constructor
             var puzzleSize = PuzzleSizeExtensions.ToPuzzleSize(Size);
 
-            var solutionGenerator = new FasterPuzzleSolutionGenerator(puzzleSize);
+            var solutionGenerator = new OptimizedPuzzleSolutionGenerator(puzzleSize);
 
             solutionGenerator.CreatePuzzleSolution();
             var solution = solutionGenerator.PuzzleGrid.ByRow()
