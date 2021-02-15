@@ -72,7 +72,7 @@ namespace SudokuSharp.Engine.Tests
             })
             {
                 var sut = new PuzzleSet(size);
-                foreach (var value in Enumerable.Range(1, sut.MaxValue).Select(v => Convert.ToByte(v)))
+                foreach (var value in Enumerable.Range(1, sut.MaxValue).Select(Convert.ToByte))
                 {
                     Assert.True(sut.Add(value));
                     Assert.Equal(value, sut.Count);
@@ -91,17 +91,37 @@ namespace SudokuSharp.Engine.Tests
             })
             {
                 var sut = new PuzzleSet(size);
-                foreach (var value in Enumerable.Range(1, sut.MaxValue).Select(v => Convert.ToByte(v)))
+                foreach (var value in Enumerable.Range(1, sut.MaxValue).Select(Convert.ToByte))
                 {
                     Assert.True(sut.Add(value));
                     Assert.Equal(value, sut.Count);
                 }
 
-                foreach (var value in Enumerable.Range(1, sut.MaxValue).Select(v => Convert.ToByte(v)))
+                foreach (var value in Enumerable.Range(1, sut.MaxValue).Select(Convert.ToByte))
                 {
                     Assert.False(sut.Add(value));
                     Assert.Equal(sut.MaxValue, sut.Count);
                 }
+            }
+        }
+
+        [Fact]
+        public void PuzzleSet_AddRange_Test1()
+        {
+            foreach (var size in new[]
+            {
+                PuzzleSize.FourByFour,
+                PuzzleSize.NineByNine,
+                PuzzleSize.SixteenBySixteen
+            })
+            {
+                var sut = new PuzzleSet(size);
+
+                Assert.True(sut.AddRange(Enumerable.Range(1, sut.MaxValue).Select(Convert.ToByte)));
+                Assert.Equal(sut.MaxValue, sut.Count);
+
+                Assert.False(sut.AddRange(Enumerable.Range(1, sut.MaxValue).Select(Convert.ToByte)));
+                Assert.Equal(sut.MaxValue, sut.Count);
             }
         }
 
@@ -116,12 +136,10 @@ namespace SudokuSharp.Engine.Tests
             })
             {
                 var sut = new PuzzleSet(size);
-                foreach (var value in Enumerable.Range(1, sut.MaxValue).Select(v => Convert.ToByte(v)))
-                {
-                    Assert.True(sut.Add(value));
-                    Assert.NotEmpty(sut);
-                    Assert.Equal(value, sut.Count);
-                }
+
+                Assert.True(sut.AddRange(Enumerable.Range(1, sut.MaxValue).Select(Convert.ToByte)));
+                Assert.NotEmpty(sut);
+                Assert.Equal(sut.MaxValue, sut.Count);
 
                 sut.Clear();
                 Assert.Empty(sut);
@@ -139,7 +157,7 @@ namespace SudokuSharp.Engine.Tests
             })
             {
                 var sut = new PuzzleSet(size);
-                foreach (var value in Enumerable.Range(1, sut.MaxValue).Select(v => Convert.ToByte(v)))
+                foreach (var value in Enumerable.Range(1, sut.MaxValue).Select(Convert.ToByte))
                 {
                     Assert.True(sut.Add(value));
                     Assert.Contains(value, sut);
@@ -161,17 +179,12 @@ namespace SudokuSharp.Engine.Tests
             })
             {
                 var sut = new PuzzleSet(size);
-                foreach (var value in Enumerable.Range(1, sut.MaxValue).Select(v => Convert.ToByte(v)))
-                {
-                    Assert.True(sut.Add(value));
-                }
+                Assert.True(sut.AddRange(Enumerable.Range(1, sut.MaxValue).Select(Convert.ToByte)));
 
                 var actual = new byte[sut.MaxValue];
                 sut.CopyTo(actual, 0);
 
-                var expected = Enumerable.Range(1, sut.MaxValue)
-                    .Select(v => Convert.ToByte(v))
-                    .ToArray();
+                var expected = Enumerable.Range(1, sut.MaxValue).Select(Convert.ToByte).ToArray();
                 Assert.Equal(expected, actual);
             }
         }
@@ -181,15 +194,9 @@ namespace SudokuSharp.Engine.Tests
         {
             var sut1 = new PuzzleSet(PuzzleSize.NineByNine);
             var sut2 = new PuzzleSet(PuzzleSize.NineByNine);
-            for (byte i = 1; i < 6; i++)
-            {
-                sut1.Add(i);
-            }
 
-            for (byte i = 3; i < 10; i++)
-            {
-                sut2.Add(i);
-            }
+            sut1.AddRange(new byte[] {1, 2, 3, 4, 5});
+            sut2.AddRange(new byte[] {3, 4, 5, 6, 7, 8, 9});
 
             sut2.ExceptWith(sut1);
 
@@ -200,12 +207,12 @@ namespace SudokuSharp.Engine.Tests
         public void PuzzleSet_GetEnumerator_Test1()
         {
             var sut = new PuzzleSet(PuzzleSize.NineByNine);
+            var list = new List<byte>();
             for (byte i = 1; i < 6; i++)
             {
                 sut.Add(i);
+                list.Add(i);
             }
-
-            var list = new List<byte>(sut);
 
             Assert.Equal(sut, list);
         }
@@ -215,15 +222,9 @@ namespace SudokuSharp.Engine.Tests
         {
             var sut1 = new PuzzleSet(PuzzleSize.NineByNine);
             var sut2 = new PuzzleSet(PuzzleSize.NineByNine);
-            for (byte i = 1; i < 6; i++)
-            {
-                sut1.Add(i);
-            }
 
-            for (byte i = 3; i < 10; i++)
-            {
-                sut2.Add(i);
-            }
+            sut1.AddRange(new byte[] { 1, 2, 3, 4, 5 });
+            sut2.AddRange(new byte[] { 3, 4, 5, 6, 7, 8, 9 });
 
             sut2.IntersectWith(sut1);
 
@@ -236,15 +237,8 @@ namespace SudokuSharp.Engine.Tests
             var sut1 = new PuzzleSet(PuzzleSize.NineByNine);
             var allNumbers = new PuzzleSet(PuzzleSize.NineByNine);
 
-            for (byte i = 1; i < 5; i++)
-            {
-                sut1.Add(i);
-            }
-
-            for (byte i = 1; i < 10; i++)
-            {
-                allNumbers.Add(i);
-            }
+            sut1.AddRange(new byte[] { 1, 2, 3, 4 });
+            allNumbers.AddRange(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
 
             TestContext.WriteLine("lowNumbers overlaps allNumbers: {0}",
                 sut1.Overlaps(allNumbers));
@@ -255,7 +249,7 @@ namespace SudokuSharp.Engine.Tests
             // Show the results of sub/superset testing
             Assert.True(sut1.IsSubsetOf(allNumbers));
             Assert.True(allNumbers.IsSupersetOf(sut1));
-            Assert.True(sut1.IsProperSubsetOf(allNumbers));;
+            Assert.True(sut1.IsProperSubsetOf(allNumbers));
             Assert.True(allNumbers.IsProperSupersetOf(sut1));
 
             // Modify allNumbers to remove numbers that are not in sut1.
@@ -265,7 +259,7 @@ namespace SudokuSharp.Engine.Tests
 
             Assert.True(sut1.IsSubsetOf(allNumbers));
             Assert.True(allNumbers.IsSupersetOf(sut1));
-            Assert.False(sut1.IsProperSubsetOf(allNumbers)); ;
+            Assert.False(sut1.IsProperSubsetOf(allNumbers));
             Assert.False(allNumbers.IsProperSupersetOf(sut1));
         }
 
@@ -276,22 +270,9 @@ namespace SudokuSharp.Engine.Tests
             var sut2 = new PuzzleSet(PuzzleSize.NineByNine);
             var sut3 = new PuzzleSet(PuzzleSize.NineByNine);
 
-            for (byte value = 1; value <= 3; value++)
-            {
-                sut1.Add(value);
-                sut2.Add(value);
-            }
-
-            for (byte value = 4; value <= 6; value++)
-            {
-                sut2.Add(value);
-            }
-
-            for (byte value = 7; value <= 9; value++)
-            {
-                sut2.Add(value);
-                sut3.Add(value);
-            }
+            sut1.AddRange(new byte[] { 1, 2, 3 });
+            sut2.AddRange(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+            sut3.AddRange(new byte[] { 7, 8, 9 });
 
             Assert.True(sut1.Overlaps(sut2));
             Assert.True(sut2.Overlaps(sut3));
@@ -305,26 +286,17 @@ namespace SudokuSharp.Engine.Tests
             var sut2 = new PuzzleSet(PuzzleSize.NineByNine);
             var sut3 = new PuzzleSet(PuzzleSize.NineByNine);
 
-            for (byte value = 1; value <= 3; value++)
-            {
-                sut1.Add(value);
-                sut2.Add(value);
-            }
+            sut1.AddRange(new byte[] { 1, 2, 3 });
+            sut2.AddRange(new byte[] { 1, 2, 3 });
 
             Assert.True(sut1.SetEquals(sut1));
             Assert.True(sut1.SetEquals(sut2));
             Assert.True(sut2.SetEquals(sut1));
 
-            for (byte value = 4; value <= 6; value++)
-            {
-                sut2.Add(value);
-            }
+            sut2.AddRange(new byte[] { 4, 5,6 });
 
-            for (byte value = 7; value <= 9; value++)
-            {
-                sut2.Add(value);
-                sut3.Add(value);
-            }
+            sut2.AddRange(new byte[] { 7, 8, 9 });
+            sut3.AddRange(new byte[] { 7, 8, 9 });
 
             Assert.False(sut1.SetEquals(sut2));
             Assert.False(sut2.SetEquals(sut3));
@@ -338,22 +310,9 @@ namespace SudokuSharp.Engine.Tests
             var sut2 = new PuzzleSet(PuzzleSize.NineByNine);
             var sut3 = new PuzzleSet(PuzzleSize.NineByNine);
 
-            for (byte value = 1; value <= 3; value++)
-            {
-                sut1.Add(value);
-                sut2.Add(value);
-            }
-
-            for (byte value = 4; value <= 6; value++)
-            {
-                sut2.Add(value);
-            }
-
-            for (byte value = 7; value <= 9; value++)
-            {
-                sut2.Add(value);
-                sut3.Add(value);
-            }
+            sut1.AddRange(new byte[] { 1, 2, 3 });
+            sut2.AddRange(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+            sut3.AddRange(new byte[] { 7, 8, 9 });
 
             sut1.SymmetricExceptWith(sut3);
             Assert.Equal(new byte[] {1, 2, 3, 7, 8, 9}, sut1);
@@ -369,20 +328,9 @@ namespace SudokuSharp.Engine.Tests
             var sut2 = new PuzzleSet(PuzzleSize.NineByNine);
             var sut3 = new PuzzleSet(PuzzleSize.NineByNine);
 
-            for (byte value = 1; value <= 3; value++)
-            {
-                sut1.Add(value);
-            }
-
-            for (byte value = 4; value <= 6; value++)
-            {
-                sut2.Add(value);
-            }
-
-            for (byte value = 7; value <= 9; value++)
-            {
-                sut3.Add(value);
-            }
+            sut1.AddRange(new byte[] { 1, 2, 3 });
+            sut2.AddRange(new byte[] { 4, 5, 6 });
+            sut3.AddRange(new byte[] { 7, 8, 9 });
 
             sut1.UnionWith(sut3);
             Assert.Equal(new byte[] { 1, 2, 3, 7, 8, 9 }, sut1);
