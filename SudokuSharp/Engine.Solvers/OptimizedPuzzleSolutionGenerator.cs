@@ -96,7 +96,7 @@
             var boxSize = PuzzleGrid.Size.BoxSize();
             var puzzleSize = PuzzleGrid.Size.ToInt32();
 
-            var firstBoxUsed = CreateArray(boxSize, () => new BitArray(puzzleSize));
+            var firstBoxUsed = CreateArray(boxSize, () => new PuzzleSet(PuzzleGrid.Size));
 
             // load first box used values
             foreach (var boxCell in Enumerable.Range(0, puzzleSize))
@@ -105,47 +105,55 @@
                 var cellValue = cell.Value
                                 ?? throw new Exception($"Cell at {cell.Coordinate} is null");
 
-                firstBoxUsed[cell.Coordinate.Row][cellValue - 1] = true;
+                firstBoxUsed[cell.Coordinate.Row].Add(cellValue);
             }
 
-            var usedByRow = CreateArray(boxSize, () => new BitArray(puzzleSize));
+            var usedByRow = CreateArray(boxSize, () => new PuzzleSet(PuzzleGrid.Size));
 
             // chose values for first row of second box (from first box, second and third rows)
-            var firstRowPossibilities = new BitArray(firstBoxUsed[1]).Or(firstBoxUsed[2]);
+            var firstRowPossibilities = new PuzzleSet(firstBoxUsed[1]);
+            firstRowPossibilities.UnionWith(firstBoxUsed[2]);
             for (var i = 0; i < boxSize; i++)
             {
-                var value = PickRandomValueFromBitArray(firstRowPossibilities);
+                var value = PickRandomValueFromPuzzleSet(firstRowPossibilities);
 
-                usedByRow[0][value - 1] = true;
-                firstRowPossibilities[value - 1] = false;
+                usedByRow[0].Add(value);
+                firstRowPossibilities.Remove(value);
             }
 
             // chose values for second row of the second box
-            var secondRowPossibilities = (new BitArray(firstBoxUsed[0]).Or(firstBoxUsed[2])).And(new BitArray(usedByRow[0]).Not());
-            var thirdRowPossibilities = (new BitArray(firstBoxUsed[0]).Or(firstBoxUsed[1])).And(new BitArray(usedByRow[0]).Not());
+            var secondRowPossibilities = new PuzzleSet(firstBoxUsed[0]);
+            secondRowPossibilities.UnionWith(firstBoxUsed[2]);
+            secondRowPossibilities.ExceptWith(usedByRow[0]);
 
-            while (thirdRowPossibilities.CountSetBits() > 3)
+            var thirdRowPossibilities = new PuzzleSet(firstBoxUsed[0]);
+            thirdRowPossibilities.UnionWith(firstBoxUsed[1]);
+            thirdRowPossibilities.ExceptWith(usedByRow[0]);
+
+            while (thirdRowPossibilities.Count > 3)
             {
-                var value = PickRandomValueFromBitArray(secondRowPossibilities);
+                var value = PickRandomValueFromPuzzleSet(secondRowPossibilities);
 
-                usedByRow[1][value - 1] = true;
-                secondRowPossibilities[value - 1] = false;
-                thirdRowPossibilities[value - 1] = false;
+                usedByRow[1].Add(value);
+                secondRowPossibilities.Remove(value);
+                thirdRowPossibilities.Remove(value);
             }
 
             // Value for bottom row
-            usedByRow[1].Or(new BitArray(secondRowPossibilities).And(new BitArray(thirdRowPossibilities).Not()));
-            usedByRow[2].Or(thirdRowPossibilities);
+            secondRowPossibilities.ExceptWith(thirdRowPossibilities); 
+
+            usedByRow[1].UnionWith(secondRowPossibilities);
+            usedByRow[2].UnionWith(thirdRowPossibilities);
 
             // assign values to each row of the box
             for (var row = 0; row < boxSize; row++)
             {
                 for (var col = boxSize; col < 2 * boxSize; col++)
                 {
-                    var value = PickRandomValueFromBitArray(usedByRow[row]);
+                    var value = PickRandomValueFromPuzzleSet(usedByRow[row]);
 
                     PuzzleGrid[new PuzzleCoordinate(row, col)] = Convert.ToByte(value);
-                    usedByRow[row][value - 1] = false;
+                    usedByRow[row].Remove(value);
                 }
             }
         }
@@ -471,12 +479,30 @@
                 .OrderBy(x => Random.GetRandomNumber()).ToList();
         }
 
+        [Obsolete("Use PickRandomValueFromPuzzleSet instead")]
         public int PickRandomValueFromBitArray(BitArray bitArray)
         {
             var rv = 0;
             var choices = Enumerable.Range(0, bitArray.Count)
                 .Where(x => bitArray[x])
                 .Select(x => x + 1)
+                .ToArray();
+
+            if (choices.Any())
+            {
+                var index = Random.GetRandomNumber() % choices.Length;
+                rv = choices[index];
+            }
+
+            return rv;
+        }
+
+        public byte PickRandomValueFromPuzzleSet(PuzzleSet puzzleSet)
+        {
+            byte rv = 0;
+            var choices = Enumerable.Range(1, puzzleSet.MaxValue)
+                .Select(Convert.ToByte)
+                .Where(puzzleSet.Contains)
                 .ToArray();
 
             if (choices.Any())

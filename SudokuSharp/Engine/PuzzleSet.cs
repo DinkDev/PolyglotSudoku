@@ -62,9 +62,38 @@
 
         public int MaxValue { get; }
 
+        /// <summary>
+        /// Gets the number of bits set in the bitArray.
+        /// </summary>
+        /// <returns>The number of bits set in the bitArray</returns>
+        /// <remarks>
+        /// This method is extremely fast - faster then Brian Kernighan's technique.
+        /// See: http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
+        /// and http://stackoverflow.com/questions/5063178/counting-bits-set-in-a-net-bitarray-class
+        /// </remarks>
         public int Count
         {
-            get { return Bits.Cast<bool>().Count(x => x); }
+            get
+            {
+                // optimized for never going to have a size above 16
+                var intArray = new int[1];
+                Bits.CopyTo(intArray, 0);
+
+                // fix for not truncated bits in last integer that may have been set to true with SetAll()
+                // C# 8 is pretty cool (and more pythonic)!
+                intArray[^1] &= ~(-1 << (Bits.Length % 32));
+
+                var rv = intArray.Single();
+
+                unchecked
+                {
+                    rv -= ((rv >> 1) & 0x55555555);
+                    rv = (rv & 0x33333333) + ((rv >> 2) & 0x33333333);
+                    rv = ((rv + (rv >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+                }
+
+                return rv;
+            }
         }
 
         public bool IsReadOnly => false;

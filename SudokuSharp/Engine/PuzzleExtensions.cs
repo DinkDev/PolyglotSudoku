@@ -1,7 +1,6 @@
 ﻿namespace SudokuSharp.Engine
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -129,25 +128,25 @@
 
             // buffer for tracking used numbers in a ror, column or box
             var puzzleSize = puzzle.Size.ToInt32();
-            var numbersUsed = new BitArray(puzzleSize);
+            PuzzleSet numbersUsed;
 
             // Make sure every column contains the right numbers.  It's ok if a column has holes
             // as long as those cells have possibilities, in which case it's a puzzle in progress.
             // However, two numbers can't be used in the same column, even if there are holes.
             foreach (var row in puzzle.ByRow())
             {
-                numbersUsed.SetAll(false);
+                numbersUsed = new PuzzleSet(puzzle.Size);
                 foreach (var cell in row)
                 {
                     if (cell.Value.HasValue)
                     {
                         var value = cell.Value.Value;
-                        if (numbersUsed.IsSet(value, 1))
+                        if (numbersUsed.Contains(value))
                         {
                             return PuzzleStatus.Invalid;
                         }
 
-                        numbersUsed.Set(value, 1, true);
+                        numbersUsed.Add(value);
                     }
                 }
             }
@@ -155,17 +154,18 @@
             // Same for columns
             foreach (var col in puzzle.ByCol())
             {
-                numbersUsed.SetAll(false);
+                numbersUsed = new PuzzleSet(puzzle.Size);
                 foreach (var cell in col)
                 {
                     if (cell.Value.HasValue)
                     {
                         var value = cell.Value.Value;
-                        if (numbersUsed.IsSet(value, 1))
+                        if (numbersUsed.Contains(value))
                         {
                             return PuzzleStatus.Invalid;
                         }
-                        numbersUsed.Set(value, 1, true);
+
+                        numbersUsed.Add(value);
                     }
                 }
             }
@@ -173,17 +173,18 @@
             // Same for boxes
             foreach (var box in puzzle.ByBox())
             {
-                numbersUsed.SetAll(false);
+                numbersUsed = new PuzzleSet(puzzle.Size);
                 foreach (var cell in box)
                 {
                     if (cell.Value.HasValue)
                     {
                         var value = cell.Value.Value;
-                        if (numbersUsed.IsSet(value, 1))
+                        if (numbersUsed.Contains(value))
                         {
                             return PuzzleStatus.Invalid;
                         }
-                        numbersUsed.Set(value, 1, true);
+
+                        numbersUsed.Add(value);
                     }
                 }
             }
