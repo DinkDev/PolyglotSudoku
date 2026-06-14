@@ -115,7 +115,7 @@ export class DlxPuzzleSolver {
             });
 
             if (c !== undefined) {
-                const xSets: Array<[string, string]>|undefined = [...x.getValue(c)];
+                const xSets: Array<[string, string]> = [...(x.getValue(c) ?? [])];
                 if (xSets !== undefined) {
                     // tslint:disable-next-line: prefer-for-of
                     for (let i = 0; i < xSets.length; i++) {

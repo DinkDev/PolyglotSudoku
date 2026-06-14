@@ -173,7 +173,7 @@ const buildInternalStructure = (matrix: any[], numPrimaryColumns: number) => {
     return root
 }
 
-function* search(searchState: SearchState) {
+function* search(searchState: SearchState): Generator<any[]> {
 
     searchState.searchStep();
 
@@ -185,9 +185,10 @@ function* search(searchState: SearchState) {
         return;
     }
 ;
-    const c = chooseColumnWithFewestRows(searchState)
+    const c = chooseColumnWithFewestRows(searchState)!;
+    const cAsBase: DataObject = c;
     coverColumn(c);
-    for (let r = c.down; r !== c; r = r.down) {
+    for (let r: DataObject = c.down; r !== cAsBase; r = r.down) {
         searchState.pushRowIndex(r.rowIndex);
         r.loopRight((j: { listHeader: any; }) => coverColumn(j.listHeader));
         yield* search(searchState);
@@ -197,22 +198,22 @@ function* search(searchState: SearchState) {
     uncoverColumn(c);
 }
 
-const chooseColumnWithFewestRows = (searchState: { root: { loopNext: (arg0: (column: any) => void) => void; }; }) => {
-    let chosenColumn: { numberOfRows: number; } | null = null;
-    searchState.root.loopNext((column: { numberOfRows: number; }) => {
+const chooseColumnWithFewestRows = (searchState: { root: ColumnObject }) => {
+    let chosenColumn: ColumnObject | null = null;
+    searchState.root.loopNext((column: ColumnObject) => {
         if (!chosenColumn || column.numberOfRows < chosenColumn.numberOfRows) {
             chosenColumn = column;
         }
     });
-    return chosenColumn;
+    return chosenColumn as ColumnObject | null;
 }
 
-const coverColumn = (c: { unlinkColumnHeader: () => void; loopDown: (arg0: (i: any) => any) => void; } | null) => {
+const coverColumn = (c: { unlinkColumnHeader: () => void; loopDown: (arg0: (i: any) => any) => void; }) => {
     c.unlinkColumnHeader();
     c.loopDown((i: { loopRight: (arg0: (j: any) => any) => any; }) => i.loopRight((j: { listHeader: { unlinkDataObject: (arg0: any) => any; }; }) => j.listHeader.unlinkDataObject(j)));
 }
 
-const uncoverColumn = (c: { loopUp: (arg0: (i: any) => any) => void; relinkColumnHeader: () => void; } | null) => {
+const uncoverColumn = (c: { loopUp: (arg0: (i: any) => any) => void; relinkColumnHeader: () => void; }) => {
     c.loopUp((i: { loopLeft: (arg0: (j: any) => any) => any; }) => i.loopLeft((j: { listHeader: { relinkDataObject: (arg0: any) => any; }; }) => j.listHeader.relinkDataObject(j)));
     c.relinkColumnHeader();
 }

@@ -1,35 +1,33 @@
 import { solutionGenerator } from './DlxLib';
 
-const internalOnSearchStep = (onSearchStep, internalRows) =>
-    rowIndices => onSearchStep(internalRows, rowIndices);
+const internalOnSearchStep = (onSearchStep: any, internalRows: any) =>
+    (rowIndices: any) => onSearchStep(internalRows, rowIndices);
 
-const internalOnSolutionFound = (onSolutionFound, internalRows) =>
-    rowIndices => onSolutionFound(internalRows, rowIndices);
+const internalOnSolutionFound = (onSolutionFound: any, internalRows: any) =>
+    (rowIndices: any) => onSolutionFound(internalRows, rowIndices);
 
 export const solve = (puzzle: string[], onSearchStep: (_internalRows: any, _rowIndices: any) => void, onSolutionFound: (_internalRows: any, _rowIndices: any) => void) => {
-    //const internalRows = buildInternalRows(C.PUZZLE);
     const internalRows = buildInternalRows(puzzle);
     const matrix = buildDlxMatrix(internalRows);
     return solutionGenerator(
         matrix,
-        internalOnSearchStep(onSearchStep, internalRows),
-        internalOnSolutionFound(onSolutionFound, internalRows));
+        internalOnSearchStep(onSearchStep, internalRows));
 };
 
-export const rowIndicesToSolution = (puzzle, internalRows, rowIndices) => {
+export const rowIndicesToSolution = (puzzle: string[], internalRows: any[], rowIndices: any[]) => {
     const values = puzzleStringToValues(puzzle);
-    const solutionInternalRows = rowIndices.map(rowIndex => internalRows[rowIndex]);
-    solutionInternalRows.forEach(internalRow => {
+    const solutionInternalRows = rowIndices.map((rowIndex: any) => internalRows[rowIndex]);
+    solutionInternalRows.forEach((internalRow: any) => {
         const { row, col } = internalRow.coords;
         values[row * 9 + col] = String(internalRow.value);
     });
     return valuesToPuzzleString(values);
 };
 
-const puzzleStringToValues = puzzle => flatten(C.PUZZLE.map(s => s.split('')));
+const puzzleStringToValues = (puzzle: string[]) => flatten(puzzle.map((s: string) => s.split('')));
 
-const valuesToPuzzleString = values =>
-    INDICES.reduce((acc, n) => {
+const valuesToPuzzleString = (values: any[]) =>
+    INDICES.reduce((acc: string[], n: number) => {
         acc.push(values.slice(n * 9, n * 9 + 9).join(''));
         return acc;
     }, []);
@@ -39,7 +37,7 @@ const ROWS = INDICES;
 const COLS = INDICES;
 const DIGITS = INDICES.map(n => n + 1);
 
-const buildInternalRows = puzzle => {
+const buildInternalRows = (puzzle: string[]) => {
     const seqs = ROWS.map(row =>
         COLS.map(col => {
             const coords = { row, col };
@@ -49,19 +47,19 @@ const buildInternalRows = puzzle => {
     return flatten(flatten(seqs));
 };
 
-const flatten = xss => xss.reduce((acc, xs) => acc.concat(xs), []);
+const flatten = (xss: any[]) => xss.reduce((acc: any[], xs: any[]) => acc.concat(xs), []);
 
-const lookupInitialValue = (puzzle, row, col) => Number(puzzle[row][col]);
+const lookupInitialValue = (puzzle: string[], row: number, col: number) => Number(puzzle[row][col]);
 
-const buildInternalRowsForCell = (coords, initialValue) => {
+const buildInternalRowsForCell = (coords: any, initialValue: number) => {
     return initialValue
         ? [{ coords, value: initialValue, isInitialValue: true }]
         : DIGITS.map(digit => ({ coords, value: digit, isInitialValue: false }));
 };
 
-const buildDlxMatrix = internalRows => internalRows.map(internalRow => buildDlxRow(internalRow));
+const buildDlxMatrix = (internalRows: any[]) => internalRows.map((internalRow: any) => buildDlxRow(internalRow));
 
-const buildDlxRow = internalRow => {
+const buildDlxRow = (internalRow: any) => {
     const { row, col } = internalRow.coords;
     const value = internalRow.value;
     const box = rowColToBox(row, col);
@@ -73,9 +71,9 @@ const buildDlxRow = internalRow => {
     return result;
 };
 
-const rowColToBox = (row, col) => Math.floor(row - (row % 3) + (col / 3));
+const rowColToBox = (row: number, col: number) => Math.floor(row - (row % 3) + (col / 3));
 
-const encode = (major, minor) => {
+const encode = (major: number, minor: number) => {
     const result = Array(81).fill(0);
     result[major * 9 + minor] = 1;
     return result;

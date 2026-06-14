@@ -1,10 +1,14 @@
+type DirectionProp = 'up' | 'down' | 'left' | 'right';
+
 export class DataObject {
     public up: DataObject;
     public down: DataObject;
     public left: DataObject;
     public right: DataObject;
+    public listHeader: DataObject | null;
+    public rowIndex: number;
 
-    constructor(listHeader, rowIndex) {
+    constructor(listHeader: DataObject | null, rowIndex: number) {
         this.listHeader = listHeader;
         this.rowIndex = rowIndex;
         this.up = this;
@@ -12,7 +16,7 @@ export class DataObject {
         this.left = this;
         this.right = this;
         if (listHeader) {
-            listHeader.addDataObject(this);
+            (listHeader as any).addDataObject(this);
         }
     }
 
@@ -36,18 +40,18 @@ export class DataObject {
     }
 
     relinkIntoColumn() {
-        this.down.up = this
-        this.up.down = this
+        this.down.up = this;
+        this.up.down = this;
     }
 
-    loopUp(fn) { this.loop(fn, 'up') }
-    loopDown(fn) { this.loop(fn, 'down') }
-    loopLeft(fn) { this.loop(fn, 'left') }
-    loopRight(fn) { this.loop(fn, 'right') }
+    loopUp(fn: (next: DataObject) => void) { this.loop(fn, 'up'); }
+    loopDown(fn: (next: DataObject) => void) { this.loop(fn, 'down'); }
+    loopLeft(fn: (next: DataObject) => void) { this.loop(fn, 'left'); }
+    loopRight(fn: (next: DataObject) => void) { this.loop(fn, 'right'); }
 
-    loop(fn, propName: string) {
-        for (let next = this[propName]; next !== this; next = next[propName]) {
-            fn(next)
+    loop(fn: (next: DataObject) => void, propName: DirectionProp) {
+        for (let next: DataObject = this[propName]; next !== this; next = next[propName]) {
+            fn(next);
         }
     }
 }

@@ -5,15 +5,14 @@ export class ColumnObject extends DataObject {
     public nextColumnObject: ColumnObject;
     public numberOfRows: number;
 
-
     constructor() {
-        super(null, -1)
+        super(null, -1);
         this.previousColumnObject = this;
         this.nextColumnObject = this;
         this.numberOfRows = 0;
     }
 
-    appendColumnHeader(columnObject) {
+    appendColumnHeader(columnObject: ColumnObject) {
         this.previousColumnObject.nextColumnObject = columnObject;
         columnObject.nextColumnObject = this;
         columnObject.previousColumnObject = this.previousColumnObject;
@@ -30,22 +29,22 @@ export class ColumnObject extends DataObject {
         this.previousColumnObject.nextColumnObject = this;
     }
 
-    addDataObject(dataObject) {
+    addDataObject(dataObject: DataObject) {
         this.appendToColumn(dataObject);
         this.numberOfRows++;
     }
 
-    unlinkDataObject(dataObject) {
+    unlinkDataObject(dataObject: DataObject) {
         dataObject.unlinkFromColumn();
         this.numberOfRows--;
     }
 
-    relinkDataObject(dataObject) {
+    relinkDataObject(dataObject: DataObject) {
         dataObject.relinkIntoColumn();
         this.numberOfRows++;
     }
 
-    loopNext(fn) {
+    loopNext(fn: (next: ColumnObject) => void) {
         for (let next = this.nextColumnObject; next !== this; next = next.nextColumnObject) {
             fn(next);
         }
