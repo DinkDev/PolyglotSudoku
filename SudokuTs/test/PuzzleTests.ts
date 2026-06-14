@@ -1,5 +1,4 @@
-import { expect } from 'chai';
-import 'mocha';
+import { describe, it, expect } from 'vitest';
 
 import { Puzzle } from '../src/Puzzle';
 import { PuzzleSize } from '../src/PuzzleSize';

@@ -149,14 +149,13 @@ export class DlxPuzzleSolver {
                     if (JSON.stringify(k) !== JSON.stringify(j)) {
                         x.getValue(k)?.delete(i);
                     }
-
-                    const v = x.getValue(j);
-                    x.remove(j);
-                    if (v !== undefined) {
-                        cols.push(v);
-                    }
                 });
             });
+            const v = x.getValue(j);
+            x.remove(j);
+            if (v !== undefined) {
+                cols.push(v);
+            }
         });
 
         return cols;
